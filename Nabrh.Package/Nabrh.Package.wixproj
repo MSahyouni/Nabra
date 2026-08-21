@@ -1,0 +1,53 @@
+<Project Sdk="WixToolset.Sdk/7.0.0">
+  <PropertyGroup>
+    <OutputType>Package</OutputType>
+    <InstallerPlatform>x64</InstallerPlatform>
+    <AcceptEula>wix7</AcceptEula>
+
+    <!-- Locate the Tauri/Rust build output. The Cargo workspace root is one level up,
+         so binaries land in <repo>\target\{debug,release}. Configuration-matched first,
+         then the other profile as a fallback for mixed-mode local builds. -->
+    <NabrhAppDir Condition="'$(NabrhAppDir)' == '' and '$(Configuration)' == 'Debug' and Exists('$(MSBuildProjectDirectory)\..\target\debug\nabra.exe')">$(MSBuildProjectDirectory)\..\target\debug</NabrhAppDir>
+    <NabrhAppDir Condition="'$(NabrhAppDir)' == '' and '$(Configuration)' == 'Release' and Exists('$(MSBuildProjectDirectory)\..\target\release\nabra.exe')">$(MSBuildProjectDirectory)\..\target\release</NabrhAppDir>
+    <NabrhAppDir Condition="'$(NabrhAppDir)' == '' and Exists('$(MSBuildProjectDirectory)\..\target\release\nabra.exe')">$(MSBuildProjectDirectory)\..\target\release</NabrhAppDir>
+    <NabrhAppDir Condition="'$(NabrhAppDir)' == '' and Exists('$(MSBuildProjectDirectory)\..\target\debug\nabra.exe')">$(MSBuildProjectDirectory)\..\target\debug</NabrhAppDir>
+
+    <DefineConstants>$(DefineConstants);NabrhAppDir=$(NabrhAppDir)</DefineConstants>
+
+    <WordExporterDir>$(MSBuildProjectDirectory)\..\Nabrh.WordExporter\bin\publish-word</WordExporterDir>
+    <DefineConstants>$(DefineConstants);WordExporterDir=$(WordExporterDir)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nabrh.WordExporter\Nabrh.WordExporter.csproj"
+                      ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <Target Name="PublishWordExporter" BeforeTargets="CoreCompile">
+    <MSBuild Projects="..\Nabrh.WordExporter\Nabrh.WordExporter.csproj"
+             Targets="Publish"
+             Properties="Configuration=$(Configuration);RuntimeIdentifier=win-x64;SelfContained=true;PublishSingleFile=true;PublishDir=$(WordExporterDir)\" />
+    <Error Condition="!Exists('$(WordExporterDir)\Nabrh.WordExporter.exe')"
+           Text="Word exporter was not published to $(WordExporterDir)." />
+  </Target>
+
+  <!-- Fail loudly instead of packaging a placeholder.
+       The previous fallback pointed at an empty app_files\Nabrh.exe, which produced a
+       syntactically valid MSI that installed a 0-byte executable with no build error. -->
+  <Target Name="ValidateNabrhAppDir" BeforeTargets="CoreCompile">
+    <Error Condition="'$(NabrhAppDir)' == ''"
+           Text="Nabrh application binaries not found. Build the Tauri app first (cd frontend &amp;&amp; pnpm run tauri:build), or pass -p:NabrhAppDir=&lt;path&gt; explicitly. Searched: $(MSBuildProjectDirectory)\..\target\release and ...\target\debug." />
+    <Error Condition="'$(NabrhAppDir)' != '' and !Exists('$(NabrhAppDir)\nabra.exe')"
+           Text="NabrhAppDir '$(NabrhAppDir)' does not contain nabra.exe." />
+
+    <!-- Reject a zero-byte executable. MSBuild exposes no file-length property function, so
+         compare against the well-known SHA-256 of the empty input. -->
+    <GetFileHash Files="$(NabrhAppDir)\nabra.exe" Algorithm="SHA256">
+      <Output TaskParameter="Items" ItemName="_NabrhExeHashed" />
+    </GetFileHash>
+    <Error Condition="'%(_NabrhExeHashed.FileHash)' == 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855'"
+           Text="'$(NabrhAppDir)\nabra.exe' is empty (0 bytes). Refusing to package a broken installer." />
+
+    <Message Importance="high" Text="Nabrh.Package: sourcing application binaries from $(NabrhAppDir)" />
+  </Target>
+</Project>

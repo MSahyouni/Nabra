@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/Installer/">
+    <Project Path="Nabrh.Bootstrapper/Nabrh.Bootstrapper.csproj" />
+    <Project Path="Nabrh.Package/Nabrh.Package.wixproj" Type="b7dd6f7e-def8-4e67-b5b7-07ef123db6f0">
+      <Platform Project="x64" />
+    </Project>
+    <Project Path="Nabrh.Installer/Nabrh.Installer.wixproj" Type="b7dd6f7e-def8-4e67-b5b7-07ef123db6f0">
+      <Platform Project="x64" />
+    </Project>
+  </Folder>
+</Solution>

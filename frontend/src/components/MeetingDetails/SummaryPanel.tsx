@@ -21,6 +21,18 @@ import {
   saveMeetingSummaryLanguage,
   SummaryLanguageStorage,
 } from '@/lib/summary-language-preferences';
+import { invoke } from '@tauri-apps/api/core';
+
+interface WordCapability {
+  isAvailable: boolean;
+  message: string;
+}
+
+interface WordExportResponse {
+  success: boolean;
+  outputPath?: string;
+  error?: string;
+}
 
 interface SummaryPanelProps {
   meeting: {
@@ -100,6 +112,7 @@ export function SummaryPanel({
   const [summaryLang, setSummaryLang] = useState<string | null>(null);
   const [summaryLangStorage, setSummaryLangStorage] = useState<SummaryLanguageStorage>('metadata');
   const [langPickerOpen, setLangPickerOpen] = useState(false);
+  const [isExportingWord, setIsExportingWord] = useState(false);
   const languageLoadVersionRef = useRef(0);
   const activeMeetingIdRef = useRef(meeting.id);
   const languageSaveVersionRef = useRef(0);
@@ -224,6 +237,49 @@ export function SummaryPanel({
 
   const isSummaryLoading = summaryStatus === 'processing' || summaryStatus === 'summarizing' || summaryStatus === 'regenerating';
 
+  const handleExportWord = async () => {
+    if (!aiSummary || isExportingWord) return;
+
+    setIsExportingWord(true);
+    try {
+      const capability = await invoke<WordCapability>('word_export_capability');
+      if (!capability.isAvailable) {
+        toast.error('يتطلب التصدير تثبيت Microsoft Word', {
+          description: capability.message,
+        });
+        return;
+      }
+
+      const summaryMarkdown = await summaryRef.current?.getMarkdown();
+      const response = await invoke<WordExportResponse>('export_meeting_to_word', {
+        request: {
+          outputPath: '',
+          meetingTitle: meetingTitle || 'اجتماع نبرة',
+          meetingDate: meeting.created_at,
+          summaryMarkdown: summaryMarkdown || '',
+          transcript: transcripts.map((segment) => ({
+            timestamp: segment.timestamp || null,
+            speaker: null,
+            text: segment.text,
+          })),
+          openAfterExport: false,
+        },
+      });
+
+      if (response.success) {
+        toast.success('تم تصدير مستند Word', { description: response.outputPath });
+      } else if (response.error) {
+        toast.error('تعذر تصدير مستند Word', { description: response.error });
+      }
+    } catch (error) {
+      toast.error('تعذر تصدير مستند Word', {
+        description: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setIsExportingWord(false);
+    }
+  };
+
   const languageSlot = (
     <Popover open={langPickerOpen} onOpenChange={setLangPickerOpen}>
       <PopoverTrigger asChild>
@@ -295,6 +351,8 @@ export function SummaryPanel({
                 isDirty={isTitleDirty || (summaryRef.current?.isDirty || false)}
                 onSave={onSaveAll}
                 onCopy={onCopySummary}
+                onExportWord={handleExportWord}
+                isExportingWord={isExportingWord}
                 onFind={() => {
                   // TODO: Implement find in summary functionality
                   console.log('Find in summary clicked');

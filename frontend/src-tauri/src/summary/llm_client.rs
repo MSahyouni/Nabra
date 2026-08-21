@@ -43,6 +43,72 @@ pub struct MessageContent {
     pub content: String,
 }
 
+// ---------------------------------------------------------------------------
+// Ollama native /api/chat
+//
+// Ollama's OpenAI-compatible /v1/chat/completions endpoint has no way to set the
+// runtime context window: it is documented as unsupported, and Ollama silently
+// falls back to its default num_ctx (4096 in current builds).
+//
+// That was actively harmful here. SummaryService derives token_threshold from the
+// model's *architectural* context reported by /api/show — 131072 for Llama 3.1 —
+// and processor::generate_meeting_summary then sends a chunk of that size as a
+// single prompt. Ollama truncated it to 4096 tokens with no error, so a two-hour
+// meeting was summarised from only its last few minutes and the result looked
+// perfectly plausible.
+//
+// The native endpoint accepts an options object, so Ollama now goes through it.
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, Serialize)]
+pub struct OllamaOptions {
+    pub num_ctx: u32,
+    pub temperature: f32,
+}
+
+#[derive(Debug, Serialize)]
+pub struct OllamaChatRequest {
+    pub model: String,
+    pub messages: Vec<ChatMessage>,
+    pub stream: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub format: Option<serde_json::Value>,
+    pub think: bool,
+    pub keep_alive: String,
+    pub options: OllamaOptions,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct OllamaChatResponse {
+    pub message: OllamaResponseMessage,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct OllamaResponseMessage {
+    pub content: String,
+}
+
+/// Summarisation is an extractive task: the output must follow the transcript, not
+/// improvise. Ollama's own default is 0.8, which produced unstable summaries and
+/// invented action items.
+pub const OLLAMA_SUMMARY_TEMPERATURE: f32 = 0.2;
+
+/// Tokens held back from the context window for the system prompt and the model's own
+/// output when deriving a chunk size.
+pub const OLLAMA_CONTEXT_RESERVE_TOKENS: usize = 300;
+
+/// Upper bound on the num_ctx we will ask Ollama for, regardless of what the model
+/// architecturally supports.
+///
+/// num_ctx sizes the KV cache and it is allocated up front. For an 8B GQA model
+/// (32 layers, 8 KV heads, 128 head dim, fp16) the cache is about 2 GB at 16k tokens
+/// and roughly 17 GB at the 131072 that Llama 3.1 reports — enough to fail or thrash
+/// on any consumer GPU. Transcripts longer than this cap are handled by the existing
+/// multi-level chunk-and-combine path, which is what it is there for.
+///
+/// Raise this only alongside a check of the user's available VRAM.
+pub const MAX_OLLAMA_CONTEXT_TOKENS: usize = 8192;
+
 // Claude-specific request structure
 #[derive(Debug, Serialize)]
 pub struct ClaudeRequest {
@@ -91,6 +157,96 @@ impl LLMProvider {
     }
 }
 
+/// Generates a summary through Ollama's native `/api/chat` endpoint.
+///
+/// Unlike the OpenAI-compatible `/v1/chat/completions` shim this accepts an `options`
+/// object, which is the only way to set `num_ctx`. Without it Ollama applies its own
+/// default context (4096) and silently truncates anything longer — see the
+/// `OllamaChatRequest` comment for the failure this caused.
+async fn generate_summary_ollama(
+    client: &Client,
+    model_name: &str,
+    system_prompt: &str,
+    user_prompt: &str,
+    ollama_endpoint: Option<&str>,
+    num_ctx: Option<u32>,
+    response_format: Option<serde_json::Value>,
+    cancellation_token: Option<&CancellationToken>,
+) -> Result<String, String> {
+    let host = ollama_endpoint.unwrap_or("http://localhost:11434");
+    let api_url = format!("{}/api/chat", host.trim_end_matches('/'));
+
+    let effective_num_ctx = num_ctx.unwrap_or(MAX_OLLAMA_CONTEXT_TOKENS as u32);
+
+    let request_body = OllamaChatRequest {
+        model: model_name.to_string(),
+        messages: vec![
+            ChatMessage {
+                role: "system".to_string(),
+                content: system_prompt.to_string(),
+            },
+            ChatMessage {
+                role: "user".to_string(),
+                content: user_prompt.to_string(),
+            },
+        ],
+        stream: false,
+        format: response_format,
+        think: false,
+        keep_alive: "10m".to_string(),
+        options: OllamaOptions {
+            num_ctx: effective_num_ctx,
+            temperature: OLLAMA_SUMMARY_TEMPERATURE,
+        },
+    };
+
+    info!(
+        "🐞 LLM Request to Ollama (/api/chat): model={}, num_ctx={}, temperature={}",
+        model_name, effective_num_ctx, OLLAMA_SUMMARY_TEMPERATURE
+    );
+
+    let request_future = client
+        .post(&api_url)
+        .json(&request_body)
+        .timeout(REQUEST_TIMEOUT_DURATION)
+        .send();
+
+    let response = match cancellation_token {
+        Some(token) => tokio::select! {
+            result = request_future => result.map_err(map_request_error)?,
+            _ = token.cancelled() => return Err("Summary generation was cancelled".to_string()),
+        },
+        None => request_future.await.map_err(map_request_error)?,
+    };
+
+    if !response.status().is_success() {
+        let status = response.status();
+        let error_body = response
+            .text()
+            .await
+            .unwrap_or_else(|_| "Unknown error".to_string());
+        return Err(format!("Ollama request failed ({}): {}", status, error_body));
+    }
+
+    let parsed: OllamaChatResponse = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse Ollama response: {}", e))?;
+
+    Ok(parsed.message.content)
+}
+
+fn map_request_error(e: reqwest::Error) -> String {
+    if e.is_timeout() {
+        format!(
+            "LLM request timed out after {} seconds",
+            REQUEST_TIMEOUT_DURATION.as_secs()
+        )
+    } else {
+        format!("Failed to send request to LLM: {}", e)
+    }
+}
+
 /// Generates a summary using the specified LLM provider
 ///
 /// # Arguments
@@ -122,6 +278,8 @@ pub async fn generate_summary(
     max_tokens: Option<u32>,
     temperature: Option<f32>,
     top_p: Option<f32>,
+    ollama_num_ctx: Option<u32>,
+    response_format: Option<serde_json::Value>,
     app_data_dir: Option<&PathBuf>,
     cancellation_token: Option<&CancellationToken>,
 ) -> Result<String, String> {
@@ -148,6 +306,23 @@ pub async fn generate_summary(
         .map_err(|e| e.to_string());
     }
 
+    // Ollama uses its native /api/chat rather than the OpenAI-compatible shim, because only
+    // the native endpoint accepts an options object — and therefore num_ctx. See the
+    // OllamaChatRequest definition above for why that matters.
+    if provider == &LLMProvider::Ollama {
+        return generate_summary_ollama(
+            client,
+            model_name,
+            system_prompt,
+            user_prompt,
+            ollama_endpoint,
+            ollama_num_ctx,
+            response_format,
+            cancellation_token,
+        )
+        .await;
+    }
+
     let (api_url, mut headers) = match provider {
         LLMProvider::OpenAI => (
             "https://api.openai.com/v1/chat/completions".to_string(),
@@ -162,13 +337,8 @@ pub async fn generate_summary(
             header::HeaderMap::new(),
         ),
         LLMProvider::Ollama => {
-            let host = ollama_endpoint
-                .map(|s| s.to_string())
-                .unwrap_or_else(|| "http://localhost:11434".to_string());
-            (
-                format!("{}/v1/chat/completions", host),
-                header::HeaderMap::new(),
-            )
+            // Handled above via the native /api/chat endpoint.
+            unreachable!("Ollama is handled before this match statement")
         }
         LLMProvider::CustomOpenAI => {
             let endpoint = custom_openai_endpoint
@@ -267,26 +437,14 @@ pub async fn generate_summary(
     let response = if let Some(token) = cancellation_token {
         tokio::select! {
             result = request_future => {
-                result.map_err(|e| {
-                    if e.is_timeout() {
-                        format!("LLM request timed out after 60 seconds")
-                    } else {
-                        format!("Failed to send request to LLM: {}", e)
-                    }
-                })?
+                result.map_err(map_request_error)?
             }
             _ = token.cancelled() => {
                 return Err("Summary generation was cancelled".to_string());
             }
         }
     } else {
-        request_future.await.map_err(|e| {
-            if e.is_timeout() {
-                format!("LLM request timed out after 60 seconds")
-            } else {
-                format!("Failed to send request to LLM: {}", e)
-            }
-        })?
+        request_future.await.map_err(map_request_error)?
     };
 
     if !response.status().is_success() {

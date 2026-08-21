@@ -128,14 +128,14 @@ export function RecordingSettings({ onSave }: RecordingSettingsProps) {
       onSave?.(prefs);
 
       // Show success toast with device details
-      const micDevice = prefs.preferred_mic_device || 'Default';
-      const systemDevice = prefs.preferred_system_device || 'Default';
-      toast.success("Device preferences saved", {
-        description: `Microphone: ${micDevice}, System Audio: ${systemDevice}`
+      const micDevice = prefs.preferred_mic_device || 'الافتراضي';
+      const systemDevice = prefs.preferred_system_device || 'الافتراضي';
+      toast.success("تم حفظ تفضيلات الأجهزة", {
+        description: `الميكروفون: ${micDevice}، صوت النظام: ${systemDevice}`
       });
     } catch (error) {
       console.error('Failed to save recording preferences:', error);
-      toast.error("Failed to save device preferences", {
+      toast.error("تعذّر حفظ تفضيلات الأجهزة", {
         description: error instanceof Error ? error.message : String(error)
       });
     } finally {
@@ -157,7 +157,7 @@ export function RecordingSettings({ onSave }: RecordingSettingsProps) {
       <div>
         <h3 className="text-lg font-semibold mb-4">إعدادات التسجيل</h3>
         <p className="text-sm text-gray-600 mb-6">
-          Configure how your audio recordings are saved during meetings.
+          حدّد كيفية حفظ التسجيلات الصوتية أثناء الاجتماعات.
         </p>
       </div>
 
@@ -166,7 +166,7 @@ export function RecordingSettings({ onSave }: RecordingSettingsProps) {
         <div className="flex-1">
           <div className="font-medium">حفظ التسجيلات الصوتية</div>
           <div className="text-sm text-gray-600">
-            Automatically save audio files when recording stops
+            حفظ الملفات الصوتية تلقائياً عند إيقاف التسجيل
           </div>
         </div>
         <Switch
@@ -189,7 +189,7 @@ export function RecordingSettings({ onSave }: RecordingSettingsProps) {
               className="flex items-center gap-2 px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
             >
               <FolderOpen className="w-4 h-4" />
-              Open Folder
+              فتح المجلد
             </button>
           </div>
 
@@ -198,7 +198,7 @@ export function RecordingSettings({ onSave }: RecordingSettingsProps) {
               <strong>صيغة الملف:</strong> ملفات {preferences.file_format.toUpperCase()}
             </div>
             <div className="text-xs text-blue-600 mt-1">
-              Recordings are saved with timestamp: recording_YYYYMMDD_HHMMSS.{preferences.file_format}
+              تُحفظ التسجيلات بطابع زمني: recording_YYYYMMDD_HHMMSS.{preferences.file_format}
             </div>
           </div>
         </div>
@@ -208,7 +208,7 @@ export function RecordingSettings({ onSave }: RecordingSettingsProps) {
       {!preferences.auto_save && (
         <div className="p-4 border rounded-lg bg-yellow-50">
           <div className="text-sm text-yellow-800">
-            Audio recording is disabled. Enable "Save Audio Recordings" to automatically save your meeting audio.
+            حفظ الصوت معطّل. فعّل «حفظ التسجيلات الصوتية» لحفظ صوت الاجتماع تلقائياً.
           </div>
         </div>
       )}
@@ -218,7 +218,7 @@ export function RecordingSettings({ onSave }: RecordingSettingsProps) {
         <div className="flex-1">
           <div className="font-medium">إشعار بدء التسجيل</div>
           <div className="text-sm text-gray-600">
-            Show reminder to inform participants when recording starts
+            عرض تذكير لإبلاغ المشاركين عند بدء التسجيل
           </div>
         </div>
         <Switch
@@ -232,7 +232,7 @@ export function RecordingSettings({ onSave }: RecordingSettingsProps) {
         <div className="border-t pt-6">
           <h4 className="text-base font-medium text-gray-900 mb-4">أجهزة الصوت الافتراضية</h4>
           <p className="text-sm text-gray-600 mb-4">
-            Set your preferred microphone and system audio devices for recording. These will be automatically selected when starting new recordings.
+            اختر الميكروفون وجهاز صوت النظام المفضّلين؛ سيُختاران تلقائياً عند بدء تسجيل جديد.
           </p>
 
           <div className="border rounded-lg p-4 bg-gray-50">

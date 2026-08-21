@@ -1,7 +1,7 @@
 use crate::database::repositories::{
     meeting::MeetingsRepository, setting::SettingsRepository, summary::SummaryProcessesRepository,
 };
-use crate::summary::llm_client::LLMProvider;
+use crate::summary::llm_client::{self, LLMProvider};
 use crate::summary::language_detection::detect_summary_language;
 use crate::summary::metadata::read_detected_summary_language_from_metadata;
 use crate::summary::processor::{
@@ -391,25 +391,41 @@ impl SummaryService {
         };
 
         // Dynamically fetch context size based on provider and model
+        // Effective Ollama context, and the chunk size derived from it.
+        //
+        // /api/show reports the model's *architectural* maximum (131072 for Llama 3.1).
+        // Chunking against that number and then asking Ollama to actually allocate it are two
+        // different mistakes: the first produced prompts far larger than the runtime context
+        // (which Ollama truncated silently), the second would allocate a KV cache too large to
+        // fit in consumer VRAM. Both are avoided by clamping to MAX_OLLAMA_CONTEXT_TOKENS and
+        // using that same clamped number for both the chunk size and num_ctx.
+        let mut ollama_num_ctx: Option<u32> = None;
+
         let token_threshold = if provider == LLMProvider::Ollama {
-            match METADATA_CACHE.get_or_fetch(&model_name, ollama_endpoint.as_deref()).await {
-                Ok(metadata) => {
-                    // Reserve 300 tokens for prompt overhead
-                    let optimal = metadata.context_size.saturating_sub(300);
-                    info!(
-                        "✓ Using dynamic context for {}: {} tokens (chunk size: {})",
-                        model_name, metadata.context_size, optimal
-                    );
-                    optimal
-                }
+            let context_size = match METADATA_CACHE
+                .get_or_fetch(&model_name, ollama_endpoint.as_deref())
+                .await
+            {
+                Ok(metadata) => metadata.context_size,
                 Err(e) => {
                     warn!(
-                        "Failed to fetch context for {}: {}. Using default 4000",
-                        model_name, e
+                        "Failed to fetch context for {}: {}. Using default {}",
+                        model_name, e, llm_client::MAX_OLLAMA_CONTEXT_TOKENS
                     );
-                    4000  // Fallback to safe default
+                    llm_client::MAX_OLLAMA_CONTEXT_TOKENS
                 }
-            }
+            };
+
+            let effective_context = context_size.min(llm_client::MAX_OLLAMA_CONTEXT_TOKENS);
+            let chunk_size =
+                effective_context.saturating_sub(llm_client::OLLAMA_CONTEXT_RESERVE_TOKENS);
+
+            info!(
+                "✓ Ollama context for {}: model reports {}, using {} (chunk size: {})",
+                model_name, context_size, effective_context, chunk_size
+            );
+            ollama_num_ctx = Some(effective_context as u32);
+            chunk_size
         } else if provider == LLMProvider::BuiltInAI {
             // Get model's context size from registry
             use crate::summary::summary_engine::models;
@@ -520,6 +536,7 @@ impl SummaryService {
             custom_openai_max_tokens,
             custom_openai_temperature,
             custom_openai_top_p,
+            ollama_num_ctx,
             app_data_dir.as_ref(),
             Some(&cancellation_token),
             summary_language.as_deref(),

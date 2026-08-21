@@ -11,3 +11,5 @@ rustflags = [
 [env]
 MACOSX_DEPLOYMENT_TARGET = { value = "14.2", force = true }
 CMAKE_OSX_DEPLOYMENT_TARGET = "14.2"
+# whisper-rs-sys on Windows unwraps CUDA_PATH when built with --features cuda
+CUDA_PATH = { value = "C:\\Program Files\\NVIDIA GPU Computing Toolkit\\CUDA\\v12.1", force = false }

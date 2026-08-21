@@ -1,0 +1,663 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:models="clr-namespace:ERPUI.Models"
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+
+    <!-- ============ Expandable Control-Specific Spacing Scale Tokens (+7px..+10px Scale) ============ -->
+    <Thickness x:Key="PageMargin">32</Thickness>
+    <Thickness x:Key="SectionBlockGap">0,32,0,0</Thickness>
+    <Thickness x:Key="HeroCardPadding">28,22</Thickness>
+    <Thickness x:Key="StandardCardPadding">24,20</Thickness>
+    <Thickness x:Key="SubCardPadding">20,16</Thickness>
+    <Thickness x:Key="FormRowGap">0,20,0,0</Thickness>
+    <Thickness x:Key="ControlItemGap">20,0,0,0</Thickness>
+    <Thickness x:Key="HeaderBottomMargin">0,0,0,32</Thickness>
+    <Thickness x:Key="SectionGap">0,32,0,0</Thickness>
+    <Thickness x:Key="IntraCardGap">0,20,0,0</Thickness>
+    <Thickness x:Key="IconGap">0,0,18,0</Thickness>
+    <Thickness x:Key="GridCardMargin">9</Thickness>
+    <CornerRadius x:Key="CardCornerRadius">20</CornerRadius>
+
+    <!-- ============ Cards ============ -->
+    <!-- White rounded card with shadow -->
+    <Style x:Key="CardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+        <Setter Property="CornerRadius" Value="20" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="{StaticResource StandardCardPadding}" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="18" Color="#14000000" Direction="270" ShadowDepth="2" Opacity="0.35" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Executive Primary Hero Card (Expanded +8px..+10px) -->
+    <Style x:Key="HeroCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+        <Setter Property="CornerRadius" Value="22" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="{StaticResource HeroCardPadding}" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="20" Color="#14000000" Direction="270" ShadowDepth="3" Opacity="0.35" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Tinted nested sub-card (inside a white card) -->
+    <Style x:Key="SubCardStyle" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource SurfaceTintBrush}" />
+        <Setter Property="CornerRadius" Value="18" />
+        <Setter Property="BorderBrush" Value="{DynamicResource SurfaceTintBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="{StaticResource SubCardPadding}" />
+    </Style>
+
+    <!-- Borderless icon button (header bell) -->
+    <Style x:Key="IconButtonStyle" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="Root"
+                        Width="45"
+                        Height="45"
+                        Background="{TemplateBinding Background}"
+                        CornerRadius="10">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource PageBackgroundBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============ Buttons / chips ============ -->
+    <!-- Filter chip buttons -->
+    <Style x:Key="ChipButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ChipBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource ChipTextBrush}" />
+        <Setter Property="Padding" Value="18,8" />
+        <Setter Property="Margin" Value="{StaticResource ControlItemGap}" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="RootBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="14"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter x:Name="ContentPresenter"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="RootBorder" Property="Background" Value="#F0F7F4" />
+                            <Setter TargetName="RootBorder" Property="BorderBrush" Value="#042623" />
+                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="#042623" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="RootBorder" Property="Background" Value="#042623" />
+                            <Setter TargetName="RootBorder" Property="BorderBrush" Value="#042623" />
+                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="#FFFFFF" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Active (selected) filter chip -->
+    <Style x:Key="ChipButtonActiveStyle" TargetType="Button" BasedOn="{StaticResource ChipButtonStyle}">
+        <Setter Property="Background" Value="{DynamicResource PrimaryButtonBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource PrimaryButtonBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryTextBrush}" />
+    </Style>
+
+    <!-- Global Inactive Tab Button Style -->
+    <Style x:Key="InactiveTabButtonStyle" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="Root"
+                        Height="45"
+                        Padding="20,0"
+                        Background="Transparent"
+                        CornerRadius="10">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource SurfaceTintBorderBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Global Primary Action Button Style -->
+    <Style x:Key="PrimaryActionButtonStyle" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryTextBrush}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="Root"
+                        Height="42"
+                        Padding="20,0"
+                        Background="{DynamicResource PrimaryButtonBrush}"
+                        CornerRadius="10">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource PrimaryButtonHoverBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Global Secondary Action Button Style -->
+    <Style x:Key="SecondaryActionButtonStyle" TargetType="Button">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border
+                        x:Name="Root"
+                        Height="42"
+                        Padding="20,0"
+                        Background="Transparent"
+                        BorderBrush="{DynamicResource CardBorderBrush}"
+                        BorderThickness="1"
+                        CornerRadius="10">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Root" Property="Background" Value="{DynamicResource SurfaceTintBrush}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Primary Dark Action Button with hover & click protection -->
+    <Style x:Key="PrimaryDarkButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="{DynamicResource PrimaryButtonBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource OnPrimaryTextBrush}" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Padding" Value="18,10" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="RootBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{DynamicResource ControlCornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter x:Name="ContentPresenter"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="RootBorder" Property="Background" Value="{DynamicResource PrimaryButtonHoverBrush}" />
+                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource OnPrimaryTextBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="RootBorder" Property="Background" Value="{DynamicResource SidebarBackgroundBrush}" />
+                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="{DynamicResource OnPrimaryTextBrush}" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="RootBorder" Property="Opacity" Value="0.6" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Secondary Outline Action Button with hover & click protection -->
+    <Style x:Key="SecondaryOutlineButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="#FFFFFF" />
+        <Setter Property="Foreground" Value="#374151" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="18,10" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="RootBorder"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{DynamicResource ControlCornerRadius}"
+                            Padding="{TemplateBinding Padding}">
+                        <ContentPresenter x:Name="ContentPresenter"
+                                           HorizontalAlignment="Center"
+                                           VerticalAlignment="Center"
+                                           TextElement.Foreground="{TemplateBinding Foreground}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="RootBorder" Property="Background" Value="#F3F4F6" />
+                            <Setter TargetName="RootBorder" Property="BorderBrush" Value="#9CA3AF" />
+                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="#111827" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="RootBorder" Property="Background" Value="#E5E7EB" />
+                            <Setter TargetName="RootBorder" Property="BorderBrush" Value="#6B7280" />
+                            <Setter TargetName="ContentPresenter" Property="TextElement.Foreground" Value="#111827" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="RootBorder" Property="Opacity" Value="0.5" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Colored status pills -->
+    <Style x:Key="StatusBadgeStyle" TargetType="Border">
+        <Setter Property="Padding" Value="8,4" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- Consistent search input -->
+    <Style x:Key="SearchBoxStyle" TargetType="ui:TextBox">
+        <Setter Property="Background" Value="#FFFFFF" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}" />
+        <Setter Property="Icon" Value="Search24" />
+        <Setter Property="IconPlacement" Value="Right" />
+        <Setter Property="PlaceholderText" Value="بحث..." />
+        <Setter Property="Height" Value="42" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="Margin" Value="0,0,12,0" />
+    </Style>
+
+    <!-- Top-of-page KPI cards with icon -->
+    <Style x:Key="SummaryMetricCardStyle" TargetType="Border" BasedOn="{StaticResource CardStyle}">
+        <Setter Property="Margin" Value="{StaticResource GridCardMargin}" />
+        <!-- Further specializations can be done in templates -->
+    </Style>
+
+    <!-- Table/list column headers -->
+    <Style x:Key="DataTableHeaderStyle" TargetType="TextBlock">
+        <Setter Property="Foreground" Value="{DynamicResource SecondaryTextBrush}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+    </Style>
+
+    <!-- Circular user avatar with initials -->
+    <Style x:Key="AvatarStyle" TargetType="Border">
+        <Setter Property="Width" Value="32" />
+        <Setter Property="Height" Value="32" />
+        <Setter Property="CornerRadius" Value="16" />
+        <Setter Property="Background" Value="{DynamicResource PrimaryButtonBrush}" />
+    </Style>
+
+    <!-- ============ Dashboard card templates (shared by DashboardPage & SeniorManagementPage) ============ -->
+    <DataTemplate DataType="{x:Type models:DashboardSummaryCard}">
+        <Border Margin="{StaticResource GridCardMargin}" Style="{StaticResource HeroCardStyle}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border
+                    Grid.Column="0"
+                    Width="40"
+                    Height="40"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Top"
+                    Background="{Binding AccentBrush}"
+                    CornerRadius="10">
+                    <ui:SymbolIcon
+                        Symbol="{Binding IconSymbol}"
+                        FontSize="24"
+                        Foreground="White" />
+                </Border>
+
+                <StackPanel Grid.Column="1" Margin="{StaticResource IconGap}" HorizontalAlignment="Right" VerticalAlignment="Center">
+                    <TextBlock FontSize="13" Foreground="{DynamicResource SecondaryTextBrush}" Text="{Binding Title}" TextAlignment="Right" />
+                    <TextBlock Margin="0,8,0,0" FontSize="32" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Text="{Binding Value}" TextAlignment="Right" />
+                    <TextBlock Margin="0,4,0,0" FontSize="13" Foreground="{DynamicResource MutedTextBrush}" Text="{Binding Caption}" TextAlignment="Right" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type models:DepartmentStatusCard}">
+        <Border Margin="{StaticResource GridCardMargin}" Style="{StaticResource CardStyle}">
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border
+                        Grid.Column="0"
+                        Width="36"
+                        Height="36"
+                        HorizontalAlignment="Right"
+                        VerticalAlignment="Top"
+                        Background="{Binding StatusBrush}"
+                        CornerRadius="10">
+                        <ui:SymbolIcon
+                            Symbol="{Binding IconSymbol}"
+                            FontSize="24"
+                            Foreground="White" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" Margin="{StaticResource IconGap}" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <TextBlock FontSize="14" Foreground="{DynamicResource SecondaryTextBrush}" Text="{Binding Status}" TextAlignment="Right" />
+                        <TextBlock Margin="0,6,0,0" FontSize="22" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Text="{Binding Name}" TextAlignment="Right" />
+                        <TextBlock Margin="0,4,0,0" FontSize="13" Foreground="{DynamicResource SecondaryTextBrush}" Text="{Binding Lead, StringFormat=المسؤول: {0}}" TextAlignment="Right" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid Margin="{StaticResource SectionGap}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" HorizontalAlignment="Right">
+                        <TextBlock FontSize="13" Foreground="{DynamicResource SecondaryTextBrush}" Text="الموظفين" TextAlignment="Right" />
+                        <TextBlock Margin="0,6,0,0" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Text="{Binding Employees}" TextAlignment="Right" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" HorizontalAlignment="Right">
+                        <TextBlock FontSize="13" Foreground="{DynamicResource SecondaryTextBrush}" Text="المهام" TextAlignment="Right" />
+                        <TextBlock Margin="0,6,0,0" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Text="{Binding Tasks}" TextAlignment="Right" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" HorizontalAlignment="Right">
+                        <TextBlock FontSize="13" Foreground="{DynamicResource SecondaryTextBrush}" Text="نسبة الإنجاز" TextAlignment="Right" />
+                        <TextBlock Margin="0,6,0,0" FontSize="18" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Text="{Binding Progress, StringFormat={}{0}%}" TextAlignment="Right" />
+                    </StackPanel>
+                </Grid>
+
+                <ProgressBar
+                    Margin="0,18,0,0"
+                    Height="6"
+                    Maximum="100"
+                    Value="{Binding Progress}"
+                    Foreground="{Binding StatusBrush}"
+                    Background="{DynamicResource ProgressTrackBrush}" />
+            </StackPanel>
+        </Border>
+    </DataTemplate>
+
+    <!-- ============ User Profile ContextMenu & MenuItem Styles (Figma 1:42532) ============ -->
+    <Style x:Key="UserProfileContextMenuStyle" TargetType="ContextMenu">
+        <Setter Property="Background" Value="#FFFFFF" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="6" />
+        <Setter Property="Width" Value="280" />
+        <Setter Property="FlowDirection" Value="RightToLeft" />
+        <Setter Property="HasDropShadow" Value="True" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ContextMenu">
+                    <Border x:Name="Border"
+                            Background="#FFFFFF"
+                            BorderBrush="{DynamicResource CardBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="12"
+                            Padding="6">
+                        <Border.Effect>
+                            <DropShadowEffect BlurRadius="16" Color="#000000" Direction="270" ShadowDepth="4" Opacity="0.12" />
+                        </Border.Effect>
+                        <StackPanel IsItemsHost="True" />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- RadioButton style for mutually exclusive Quick Role Switcher -->
+    <Style x:Key="UserProfileRadioButtonStyle" TargetType="RadioButton">
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Margin" Value="0,2" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="#101828" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="RadioButton">
+                    <Border x:Name="Border"
+                            Background="Transparent"
+                            CornerRadius="8"
+                            Padding="12,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:SymbolIcon x:Name="IconHost"
+                                           Grid.Column="0"
+                                           Margin="0,0,10,0"
+                                           VerticalAlignment="Center"
+                                           FontSize="18"
+                                           Foreground="#374151"
+                                           Symbol="{Binding RelativeSource={RelativeSource AncestorType=RadioButton}, Path=Tag}" />
+
+                            <TextBlock x:Name="HeaderHost"
+                                       Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#101828"
+                                       Text="{TemplateBinding Content}" />
+
+                            <ui:SymbolIcon x:Name="CheckIcon"
+                                           Grid.Column="2"
+                                           Margin="8,0,0,0"
+                                           VerticalAlignment="Center"
+                                           FontSize="16"
+                                           Foreground="#E6D99C"
+                                           Symbol="Checkmark24"
+                                           Visibility="Collapsed" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="#F3F4F6" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="#042623" />
+                            <Setter TargetName="HeaderHost" Property="Foreground" Value="#FFFFFF" />
+                            <Setter TargetName="IconHost" Property="Foreground" Value="#E6D99C" />
+                            <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsChecked" Value="True" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background" Value="#0C3E3A" />
+                            <Setter TargetName="HeaderHost" Property="Foreground" Value="#FFFFFF" />
+                            <Setter TargetName="IconHost" Property="Foreground" Value="#E6D99C" />
+                            <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="UserProfileMenuItemStyle" TargetType="MenuItem">
+        <Setter Property="Height" Value="40" />
+        <Setter Property="Margin" Value="0,2" />
+        <Setter Property="Padding" Value="12,0" />
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="#101828" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="MenuItem">
+                    <Border x:Name="Border"
+                            Background="Transparent"
+                            CornerRadius="8"
+                            Padding="12,8">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <ui:SymbolIcon x:Name="IconHost"
+                                           Grid.Column="0"
+                                           Margin="0,0,10,0"
+                                           VerticalAlignment="Center"
+                                           FontSize="18"
+                                           Foreground="#374151"
+                                           Symbol="{Binding RelativeSource={RelativeSource AncestorType=MenuItem}, Path=Icon}" />
+
+                            <TextBlock x:Name="HeaderHost"
+                                       Grid.Column="1"
+                                       VerticalAlignment="Center"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Foreground="#101828"
+                                       Text="{TemplateBinding Header}" />
+
+                            <ui:SymbolIcon x:Name="CheckIcon"
+                                           Grid.Column="2"
+                                           Margin="8,0,0,0"
+                                           VerticalAlignment="Center"
+                                           FontSize="16"
+                                           Foreground="#E6D99C"
+                                           Symbol="Checkmark24"
+                                           Visibility="Collapsed" />
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="#F3F4F6" />
+                        </Trigger>
+                        <Trigger Property="IsHighlighted" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="#F3F4F6" />
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="#042623" />
+                            <Setter TargetName="HeaderHost" Property="Foreground" Value="#FFFFFF" />
+                            <Setter TargetName="IconHost" Property="Foreground" Value="#E6D99C" />
+                            <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
+                        </Trigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsChecked" Value="True" />
+                                <Condition Property="IsMouseOver" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background" Value="#0C3E3A" />
+                            <Setter TargetName="HeaderHost" Property="Foreground" Value="#FFFFFF" />
+                            <Setter TargetName="IconHost" Property="Foreground" Value="#E6D99C" />
+                            <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
+                        </MultiTrigger>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsChecked" Value="True" />
+                                <Condition Property="IsHighlighted" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background" Value="#0C3E3A" />
+                            <Setter TargetName="HeaderHost" Property="Foreground" Value="#FFFFFF" />
+                            <Setter TargetName="IconHost" Property="Foreground" Value="#E6D99C" />
+                            <Setter TargetName="CheckIcon" Property="Visibility" Value="Visible" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ============ Universal Validation Error Template & Control Styles ============ -->
+    <ControlTemplate x:Key="DefaultValidationErrorTemplate">
+        <DockPanel LastChildFill="True">
+            <Border BorderBrush="#DC2626" BorderThickness="1.5" CornerRadius="10" DockPanel.Dock="Top">
+                <AdornedElementPlaceholder x:Name="customAdorner" />
+            </Border>
+        </DockPanel>
+    </ControlTemplate>
+
+    <Style TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource DefaultValidationErrorTemplate}" />
+    </Style>
+
+    <Style TargetType="PasswordBox" BasedOn="{StaticResource {x:Type PasswordBox}}">
+        <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource DefaultValidationErrorTemplate}" />
+    </Style>
+
+    <Style TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+    </Style>
+
+    <Style TargetType="ui:TextBox" BasedOn="{StaticResource {x:Type ui:TextBox}}">
+        <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource DefaultValidationErrorTemplate}" />
+    </Style>
+
+    <Style TargetType="ui:PasswordBox" BasedOn="{StaticResource {x:Type ui:PasswordBox}}">
+        <Setter Property="Border.CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="Validation.ErrorTemplate" Value="{StaticResource DefaultValidationErrorTemplate}" />
+    </Style>
+
+</ResourceDictionary>
+

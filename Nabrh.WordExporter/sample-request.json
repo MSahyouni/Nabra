@@ -1,0 +1,14 @@
+{
+  "outputPath": "Nabrh.WordExporter/test-output.docx",
+  "meetingTitle": "اجتماع اختبار نبرة",
+  "meetingDate": "2026-08-21",
+  "summaryMarkdown": "# الملخص\n- تم التحقق من التصدير المحلي عبر Word COM Engine.",
+  "transcript": [
+    {
+      "timestamp": "00:00:01",
+      "speaker": "المتحدث الأول",
+      "text": "هذا نص عربي للتحقق من اتجاه المستند وتنسيقه."
+    }
+  ],
+  "openAfterExport": false
+}

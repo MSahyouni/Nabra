@@ -43,7 +43,7 @@ export function OnboardingContainer({
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-50 flex items-center justify-center z-50 overflow-hidden">
+    <div dir="rtl" className="fixed inset-0 bg-brand-surface flex items-center justify-center z-50 overflow-hidden">
       <div className={cn('w-full max-w-2xl h-full max-h-screen flex flex-col px-6 py-6', className)}>
         {/* Progress Indicator with Navigation - Fixed */}
         {step && !hideProgress && (
@@ -61,7 +61,7 @@ export function OnboardingContainer({
                       : 'opacity-0 cursor-not-allowed'
                   )}
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronRight className="w-4 h-4" />
                 </button>
 
                 <button
@@ -74,7 +74,7 @@ export function OnboardingContainer({
                       : 'opacity-0 cursor-not-allowed'
                   )}
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronLeft className="w-4 h-4" />
                 </button>
               </div>
             )}
@@ -86,7 +86,7 @@ export function OnboardingContainer({
 
         {/* Header - Fixed */}
         <div className="mb-4 text-center space-y-3 flex-shrink-0">
-          <h1 className="text-4xl font-semibold text-gray-900 animate-fade-in-up">{title}</h1>
+          <h1 className="text-4xl font-semibold text-brand-dark animate-fade-in-up">{title}</h1>
           {description && (
             <p className="text-base text-gray-600 max-w-md mx-auto animate-fade-in-up delay-75">
               {description}
@@ -95,7 +95,7 @@ export function OnboardingContainer({
         </div>
 
         {/* Content - Scrollable */}
-        <div className="flex-1 overflow-y-auto pr-2">
+        <div className="flex-1 overflow-y-auto pl-2">
           <div className="space-y-6">{children}</div>
         </div>
       </div>

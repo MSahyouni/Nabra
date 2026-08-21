@@ -1,0 +1,225 @@
+<!--
+  Icon resources for SystemSettingsPage.
+  Converted 1:1 from the Figma-exported SVGs in Assets/figma/settings/ (stroke-based vuesax/lucide icons).
+  Path data, stroke colors and stroke widths are copied verbatim from the SVG sources.
+-->
+<ResourceDictionary
+  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- icon-search.svg (viewBox 0 0 19.542 19.542, stroke #99A1AF) -->
+  <DrawingImage x:Key="SettingsIconSearch">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#00FFFFFF" Geometry="M0,0H19.542V19.542H0Z" />
+        <GeometryDrawing Geometry="M8.9554 15.4709C12.553 15.4709 15.4694 12.5544 15.4694 8.95687C15.4694 5.35929 12.553 2.44287 8.9554 2.44287C5.35782 2.44287 2.44141 5.35929 2.44141 8.95687C2.44141 12.5544 5.35782 15.4709 8.9554 15.4709Z">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#99A1AF" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+        <GeometryDrawing Geometry="M17.0989 17.0994L13.5977 13.5981">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#99A1AF" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+
+  <!-- icon-bell.svg (viewBox 0 0 24.4275 24.4275, stroke #4A5565) -->
+  <DrawingImage x:Key="SettingsIconBell">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#00FFFFFF" Geometry="M0,0H24.4275V24.4275H0Z" />
+        <GeometryDrawing Geometry="M10.451 21.374C10.6297 21.6835 10.8866 21.9404 11.1961 22.1191C11.5055 22.2977 11.8565 22.3918 12.2139 22.3918C12.5712 22.3918 12.9222 22.2977 13.2316 22.1191C13.5411 21.9404 13.798 21.6835 13.9767 21.374">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#4A5565" Thickness="2.03562" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+        <GeometryDrawing Geometry="M3.31866 15.599C3.1857 15.7447 3.09795 15.926 3.06609 16.1207C3.03424 16.3153 3.05964 16.5151 3.13922 16.6956C3.2188 16.8761 3.34913 17.0296 3.51434 17.1374C3.67955 17.2452 3.87253 17.3027 4.0698 17.3028H20.3548C20.552 17.3029 20.7451 17.2456 20.9104 17.138C21.0757 17.0304 21.2062 16.8771 21.286 16.6967C21.3658 16.5163 21.3914 16.3166 21.3598 16.1219C21.3282 15.9272 21.2407 15.7459 21.108 15.6C19.7543 14.2046 18.3192 12.7216 18.3192 8.14251C18.3192 6.52287 17.6758 4.96957 16.5305 3.82431C15.3852 2.67905 13.8319 2.03564 12.2123 2.03564C10.5927 2.03564 9.03935 2.67905 7.89409 3.82431C6.74883 4.96957 6.10543 6.52287 6.10543 8.14251C6.10543 12.7216 4.66929 14.2046 3.31866 15.599Z">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#4A5565" Thickness="2.03562" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+
+  <!-- icon-chevron-user.svg (viewBox 0 0 19.542 19.542, stroke #6A7282) -->
+  <DrawingImage x:Key="SettingsIconChevronDown">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#00FFFFFF" Geometry="M0,0H19.542V19.542H0Z" />
+        <GeometryDrawing Geometry="M4.88672 7.32837L9.77221 12.2139L14.6577 7.32837">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#6A7282" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+
+  <!-- icon-arrow-down.svg (viewBox 0 0 24 24, vuesax/linear/arrow-down, stroke black) -->
+  <DrawingImage x:Key="SettingsIconArrowDown">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#00FFFFFF" Geometry="M0,0H24V24H0Z" />
+        <GeometryDrawing Geometry="M19.92 8.95L13.4 15.47C12.63 16.24 11.37 16.24 10.6 15.47L4.08 8.95">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#000000" Thickness="1.5" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+
+  <!-- icon-tab-system.svg (viewBox 0 0 19.542 19.542, stroke #042623) -->
+  <DrawingImage x:Key="SettingsIconTabSystem">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#00FFFFFF" Geometry="M0,0H19.542V19.542H0Z" />
+        <GeometryDrawing Geometry="M9.95138 1.62842H9.59311C9.16121 1.62842 8.74699 1.79999 8.44159 2.10539C8.13619 2.4108 7.96461 2.82501 7.96461 3.25692V3.40348C7.96432 3.68906 7.88893 3.96954 7.74602 4.21678C7.6031 4.46403 7.39768 4.66934 7.15036 4.81213L6.80024 5.0157C6.55267 5.15863 6.27185 5.23387 5.98599 5.23387C5.70013 5.23387 5.4193 5.15863 5.17174 5.0157L5.0496 4.95056C4.67591 4.73499 4.23196 4.67651 3.8152 4.78796C3.39844 4.8994 3.04292 5.17165 2.8267 5.54496L2.64756 5.85437C2.432 6.22806 2.37352 6.67201 2.48497 7.08877C2.59641 7.50553 2.86866 7.86105 3.24197 8.07727L3.3641 8.1587C3.61023 8.30079 3.81489 8.50483 3.95773 8.75052C4.10058 8.99621 4.17664 9.27501 4.17835 9.55921V9.97447C4.17949 10.2614 4.10479 10.5436 3.9618 10.7924C3.81881 11.0412 3.61262 11.2478 3.3641 11.3913L3.24197 11.4646C2.86866 11.6808 2.59641 12.0363 2.48497 12.4531C2.37352 12.8698 2.432 13.3138 2.64756 13.6875L2.8267 13.9969C3.04292 14.3702 3.39844 14.6424 3.8152 14.7539C4.23196 14.8653 4.67591 14.8068 5.0496 14.5913L5.17174 14.5261C5.4193 14.3832 5.70013 14.308 5.98599 14.308C6.27185 14.308 6.55267 14.3832 6.80024 14.5261L7.15036 14.7297C7.39768 14.8725 7.6031 15.0778 7.74602 15.325C7.88893 15.5723 7.96432 15.8528 7.96461 16.1383V16.2849C7.96461 16.7168 8.13619 17.131 8.44159 17.4364C8.74699 17.7418 9.16121 17.9134 9.59311 17.9134H9.95138C10.3833 17.9134 10.7975 17.7418 11.1029 17.4364C11.4083 17.131 11.5799 16.7168 11.5799 16.2849V16.1383C11.5802 15.8528 11.6556 15.5723 11.7985 15.325C11.9414 15.0778 12.1468 14.8725 12.3941 14.7297L12.7443 14.5261C12.9918 14.3832 13.2726 14.308 13.5585 14.308C13.8444 14.308 14.1252 14.3832 14.3728 14.5261L14.4949 14.5913C14.8686 14.8068 15.3125 14.8653 15.7293 14.7539C16.1461 14.6424 16.5016 14.3702 16.7178 13.9969L16.8969 13.6793C17.1125 13.3056 17.171 12.8617 17.0595 12.4449C16.9481 12.0281 16.6758 11.6726 16.3025 11.4564L16.1804 11.3913C15.9319 11.2478 15.7257 11.0412 15.5827 10.7924C15.4397 10.5436 15.365 10.2614 15.3661 9.97447V9.56735C15.365 9.28039 15.4397 8.99823 15.5827 8.74943C15.7257 8.50063 15.9319 8.29403 16.1804 8.15056L16.3025 8.07727C16.6758 7.86105 16.9481 7.50553 17.0595 7.08877C17.171 6.67201 17.1125 6.22806 16.8969 5.85437L16.7178 5.54496C16.5016 5.17165 16.1461 4.8994 15.7293 4.78796C15.3125 4.67651 14.8686 4.73499 14.4949 4.95056L14.3728 5.0157C14.1252 5.15863 13.8444 5.23387 13.5585 5.23387C13.2726 5.23387 12.9918 5.15863 12.7443 5.0157L12.3941 4.81213C12.1468 4.66934 11.9414 4.46403 11.7985 4.21678C11.6556 3.96954 11.5802 3.68906 11.5799 3.40348V3.25692C11.5799 2.82501 11.4083 2.4108 11.1029 2.10539C10.7975 1.79999 10.3833 1.62842 9.95138 1.62842Z">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#042623" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+        <GeometryDrawing Geometry="M9.77087 12.2136C11.12 12.2136 12.2136 11.12 12.2136 9.77087C12.2136 8.42178 11.12 7.32812 9.77087 7.32812C8.42178 7.32812 7.32812 8.42178 7.32812 9.77087C7.32812 11.12 8.42178 12.2136 9.77087 12.2136Z">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#042623" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+
+  <!-- icon-tab-roles.svg (viewBox 0 0 19.542 19.542, stroke #6B7280) -->
+  <DrawingImage x:Key="SettingsIconTabRoles">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#00FFFFFF" Geometry="M0,0H19.542V19.542H0Z" />
+        <GeometryDrawing Geometry="M16.284 10.5852C16.284 14.6565 13.4341 16.6921 10.0468 17.8727C9.86947 17.9328 9.6768 17.93 9.5013 17.8646C6.10588 16.6921 3.25601 14.6565 3.25601 10.5852V4.88546C3.25601 4.66951 3.3418 4.4624 3.4945 4.3097C3.6472 4.157 3.85431 4.07121 4.07026 4.07121C5.69876 4.07121 7.73438 3.09411 9.15117 1.85645C9.32368 1.70907 9.54312 1.6281 9.77 1.6281C9.99689 1.6281 10.2163 1.70907 10.3888 1.85645C11.8138 3.10225 13.8413 4.07121 15.4697 4.07121C15.6857 4.07121 15.8928 4.157 16.0455 4.3097C16.1982 4.4624 16.284 4.66951 16.284 4.88546V10.5852Z">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#6B7280" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+
+  <!-- icon-tab-users.svg (viewBox 0 0 19.542 19.542, stroke #6B7280) -->
+  <DrawingImage x:Key="SettingsIconTabUsers">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#00FFFFFF" Geometry="M0,0H19.542V19.542H0Z" />
+        <GeometryDrawing Geometry="M13.0284 17.0991V15.4706C13.0284 14.6068 12.6853 13.7784 12.0744 13.1676C11.4636 12.5568 10.6352 12.2136 9.7714 12.2136H4.8859C4.02209 12.2136 3.19366 12.5568 2.58286 13.1676C1.97205 13.7784 1.62891 14.6068 1.62891 15.4706V17.0991">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#6B7280" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+        <GeometryDrawing Geometry="M7.32731 8.95662C9.1261 8.95662 10.5843 7.49841 10.5843 5.69962C10.5843 3.90083 9.1261 2.44263 7.32731 2.44263C5.52852 2.44263 4.07031 3.90083 4.07031 5.69962C4.07031 7.49841 5.52852 8.95662 7.32731 8.95662Z">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#6B7280" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+        <GeometryDrawing Geometry="M17.9115 17.0992V15.4707C17.911 14.7491 17.6708 14.048 17.2286 13.4777C16.7865 12.9074 16.1675 12.5 15.4688 12.3196">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#6B7280" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+        <GeometryDrawing Geometry="M13.0254 2.54858C13.726 2.72796 14.3469 3.13541 14.7904 3.7067C15.2338 4.27798 15.4745 4.98061 15.4745 5.7038C15.4745 6.42699 15.2338 7.12962 14.7904 7.7009C14.3469 8.27219 13.726 8.67964 13.0254 8.85902">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#6B7280" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+
+  <!-- icon-card-notifications.svg (viewBox 0 0 19.542 19.542, stroke #042623) -->
+  <DrawingImage x:Key="SettingsIconCardNotifications">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#00FFFFFF" Geometry="M0,0H19.542V19.542H0Z" />
+        <GeometryDrawing Geometry="M8.36133 17.0991C8.50426 17.3467 8.70984 17.5522 8.95739 17.6951C9.20495 17.8381 9.48576 17.9133 9.77161 17.9133C10.0575 17.9133 10.3383 17.8381 10.5858 17.6951C10.8334 17.5522 11.039 17.3467 11.1819 17.0991">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#042623" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+        <GeometryDrawing Geometry="M2.65595 12.479C2.54958 12.5956 2.47938 12.7406 2.4539 12.8964C2.42841 13.0521 2.44874 13.2119 2.5124 13.3563C2.57607 13.5007 2.68032 13.6235 2.81249 13.7097C2.94466 13.796 3.09905 13.842 3.25686 13.8421H16.2849C16.4427 13.8421 16.5971 13.7963 16.7293 13.7103C16.8616 13.6242 16.966 13.5015 17.0298 13.3572C17.0936 13.2129 17.1142 13.0531 17.0889 12.8974C17.0636 12.7416 16.9936 12.5966 16.8874 12.4798C15.8044 11.3635 14.6564 10.1771 14.6564 6.51384C14.6564 5.21813 14.1416 3.97548 13.2254 3.05927C12.3092 2.14307 11.0666 1.62835 9.77086 1.62835C8.47515 1.62835 7.2325 2.14307 6.31629 3.05927C5.40008 3.97548 4.88536 5.21813 4.88536 6.51384C4.88536 10.1771 3.73646 11.3635 2.65595 12.479Z">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#042623" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+
+  <!-- icon-card-system.svg (globe, viewBox 0 0 19.542 19.542, stroke #042623) -->
+  <DrawingImage x:Key="SettingsIconCardSystem">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#00FFFFFF" Geometry="M0,0H19.542V19.542H0Z" />
+        <GeometryDrawing Geometry="M9.7714 17.9134C14.2684 17.9134 17.9139 14.2679 17.9139 9.77091C17.9139 5.27394 14.2684 1.62842 9.7714 1.62842C5.27442 1.62842 1.62891 5.27394 1.62891 9.77091C1.62891 14.2679 5.27442 17.9134 9.7714 17.9134Z">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#042623" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+        <GeometryDrawing Geometry="M9.77262 1.62842C7.68182 3.82376 6.51563 6.73925 6.51562 9.77091C6.51563 12.8026 7.68182 15.7181 9.77262 17.9134C11.8634 15.7181 13.0296 12.8026 13.0296 9.77091C13.0296 6.73925 11.8634 3.82376 9.77262 1.62842Z">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#042623" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+        <GeometryDrawing Geometry="M1.62891 9.771H17.9139">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#042623" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+
+  <!-- icon-card-backup.svg (database, viewBox 0 0 19.542 19.542, stroke #042623) -->
+  <DrawingImage x:Key="SettingsIconCardBackup">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#00FFFFFF" Geometry="M0,0H19.542V19.542H0Z" />
+        <GeometryDrawing Geometry="M9.77145 6.51381C13.8187 6.51381 17.0997 5.42016 17.0997 4.07106C17.0997 2.72197 13.8187 1.62832 9.77145 1.62832C5.72418 1.62832 2.44321 2.72197 2.44321 4.07106C2.44321 5.42016 5.72418 6.51381 9.77145 6.51381Z">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#042623" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+        <GeometryDrawing Geometry="M2.44321 4.07106V15.4706C2.44321 16.1184 3.21529 16.7397 4.5896 17.1978C5.96392 17.6559 7.82788 17.9133 9.77145 17.9133C11.715 17.9133 13.579 17.6559 14.9533 17.1978C16.3276 16.7397 17.0997 16.1184 17.0997 15.4706V4.07106">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#042623" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+        <GeometryDrawing Geometry="M2.44321 9.77091C2.44321 10.4188 3.21529 11.0401 4.5896 11.4982C5.96392 11.9563 7.82788 12.2137 9.77145 12.2137C11.715 12.2137 13.579 11.9563 14.9533 11.4982C16.3276 11.0401 17.0997 10.4188 17.0997 9.77091">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#042623" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+
+  <!-- icon-card-security.svg (lock, viewBox 0 0 19.542 19.542, stroke #042623) -->
+  <DrawingImage x:Key="SettingsIconCardSecurity">
+    <DrawingImage.Drawing>
+      <DrawingGroup>
+        <GeometryDrawing Brush="#00FFFFFF" Geometry="M0,0H19.542V19.542H0Z" />
+        <GeometryDrawing Geometry="M15.4712 8.9569H4.07171C3.17231 8.9569 2.44321 9.68601 2.44321 10.5854V16.2851C2.44321 17.1845 3.17231 17.9136 4.07171 17.9136H15.4712C16.3706 17.9136 17.0997 17.1845 17.0997 16.2851V10.5854C17.0997 9.68601 16.3706 8.9569 15.4712 8.9569Z">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#042623" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+        <GeometryDrawing Geometry="M5.69941 8.9569V5.69991C5.69941 4.62015 6.12835 3.58461 6.89185 2.8211C7.65536 2.05759 8.6909 1.62866 9.77066 1.62866C10.8504 1.62866 11.886 2.05759 12.6495 2.8211C13.413 3.58461 13.8419 4.62015 13.8419 5.69991V8.9569">
+          <GeometryDrawing.Pen>
+            <Pen Brush="#042623" Thickness="1.6285" StartLineCap="Round" EndLineCap="Round" LineJoin="Round" />
+          </GeometryDrawing.Pen>
+        </GeometryDrawing>
+      </DrawingGroup>
+    </DrawingImage.Drawing>
+  </DrawingImage>
+
+</ResourceDictionary>
+

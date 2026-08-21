@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- The default OnlineBundle build downloads the three vendor bootstrappers into obj at build
+     time and embeds them in the Burn bundle. WebView2 and NVIDIA's network installer then fetch
+     their selected runtime payloads on the target machine. For a custom/offline build, define
+     VcRedistExe, WebView2Exe and CudaNetworkExe explicitly:
+       dotnet build Nabrh.Installer\Nabrh.Installer.wixproj -c Release ^
+         -p:OnlineBundle=false ^
+         -p:DefineConstants="VcRedistExe=C:\redist\VC_redist.x64.exe;WebView2Exe=C:\redist\MicrosoftEdgeWebview2Setup.exe;CudaNetworkExe=C:\redist\cuda_12.1.0_windows_network.exe" -->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:bal="http://wixtoolset.org/schemas/v4/wxs/bal"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <Bundle Name="نبرة — المساعد الذكي للاجتماعات"
+          Manufacturer="نبرة للذكاء الاصطناعي"
+          Version="0.4.0.0"
+          UpgradeCode="E8F0075A-0541-4CB0-BBC8-8DE0B4383CFF"
+          Compressed="yes">
+
+    <Variable Name="InstallFolder"
+              Type="string"
+              Value="[ProgramFiles64Folder]Nabrh"
+              bal:Overridable="yes" />
+
+    <!-- Central system-administrator approval gate. The URL is fixed at build time; only the
+         one-time approval code can be supplied by an administrator for unattended deployment. -->
+    <Variable Name="NabrhApprovalServerUrl"
+              Type="string"
+              Value="$(var.ApprovalServerUrl)"
+              Hidden="yes" />
+    <Variable Name="NabrhApprovalCode"
+              Type="string"
+              Value=""
+              Hidden="yes"
+              bal:Overridable="yes" />
+    <Variable Name="NabrhApprovalToken"
+              Type="string"
+              Value=""
+              Hidden="yes" />
+
+    <!-- Lets the managed BA distinguish a missing CUDA runtime that Burn can install from a
+         missing NVIDIA GPU/driver, which remains blocking. -->
+    <?ifdef CudaNetworkExe ?>
+    <Variable Name="NabrhCudaRuntimeChained" Type="string" Value="1" Hidden="yes" />
+    <?else?>
+    <Variable Name="NabrhCudaRuntimeChained" Type="string" Value="0" Hidden="yes" />
+    <?endif?>
+
+    <!-- No .NET runtime search: the bootstrapper application is published self-contained and
+         the Nabrh application itself is Rust/Tauri, so nothing in this bundle needs .NET.
+         (The previous search used Result="exists" against the sharedfx *parent* key, whose
+         values are the installed versions - a machine with only .NET 8 reported "installed".) -->
+
+    <!-- NVIDIA CUDA 12 is an application prerequisite. A real CUDA device and compatible driver
+         are blocking; a missing runtime is accepted only when this bundle chains the CUDA 12.1
+         network package below. Uninstall is deliberately exempt so the product remains removable
+         after a GPU or driver change. -->
+
+    <!-- 1. Microsoft Visual C++ 2015-2022 Redistributable (x64) - required by the native
+         Whisper / audio DSP / CUDA code linked into nabra.exe. -->
+    <util:RegistrySearch Id="SearchVcRedistX64"
+                         Variable="VcRedistInstalled"
+                         Root="HKLM"
+                         Key="SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64"
+                         Value="Installed"
+                         Result="value" />
+
+    <!-- 2. Microsoft Edge WebView2 Evergreen Runtime - Tauri renders the entire UI in it.
+         Without it nabra.exe installs successfully and then fails to open a window.
+         Preinstalled on Windows 11 and current Windows 10, but absent on LTSC and Server SKUs.
+         The Evergreen runtime registers its version under the EdgeUpdate client GUID; the
+         64-bit installer writes to the WOW6432Node view, which the x86 Burn engine reads by
+         default. Per-user installs land in HKCU, so both are checked. -->
+    <util:RegistrySearch Id="SearchWebView2Machine"
+                         Variable="WebView2Version"
+                         Root="HKLM"
+                         Key="SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}"
+                         Value="pv"
+                         Result="value" />
+    <util:RegistrySearch Id="SearchWebView2User"
+                         Variable="WebView2Version"
+                         Root="HKCU"
+                         Key="SOFTWARE\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}"
+                         Value="pv"
+                         Result="value"
+                         Condition="NOT WebView2Version" />
+
+    <util:RegistrySearch Id="SearchCudaToolkit12_1"
+                         Variable="CudaToolkit12_1Installed"
+                         Root="HKLM"
+                         Key="SOFTWARE\NVIDIA Corporation\GPU Computing Toolkit\CUDA\v12.1"
+                         Value="64BitInstalled"
+                         Result="value" />
+
+    <!-- WiX v5+/v7 out-of-process MBA host.
+         The BA is published self-contained + single-file (see Nabrh.Installer.wixproj,
+         target PublishBootstrapperApplication), so this one executable carries the .NET 10
+         runtime, WPF, mbanative.dll and every managed dependency.
+
+         Two problems this solves:
+         1. Burn starts the BA BEFORE executing the chain, so a framework-dependent BA could
+            not be rescued by chaining the .NET Desktop Runtime — on a clean machine the
+            wizard simply never appeared.
+         2. The previous hand-maintained <Payload> list silently went stale whenever a NuGet
+            dependency was added, producing a BA that failed to load at runtime. -->
+    <BootstrapperApplication SourceFile="$(var.BaPublishDir)Nabrh.Bootstrapper.exe" />
+
+    <Chain>
+      <!-- Visual C++ 2015-2022 x64 Redistributable prerequisite. Required for native Whisper & Audio DSP. -->
+      <?ifdef VcRedistExe ?>
+      <ExePackage Id="VcRedistX64"
+                  SourceFile="$(var.VcRedistExe)"
+                  DetectCondition="VcRedistInstalled = 1"
+                  InstallArguments="/install /quiet /norestart"
+                  RepairArguments="/repair /quiet /norestart"
+                  UninstallArguments="/uninstall /quiet /norestart"
+                  Permanent="yes"
+                  Vital="yes"
+                  Compressed="yes"
+                  Protocol="burn" />
+      <?endif?>
+
+      <!-- Microsoft Edge WebView2 Evergreen Runtime. Tauri renders the whole UI in it, so this
+           is not optional: without it the app installs and then cannot open a window.
+           Permanent because it is a shared OS component other applications depend on. -->
+      <?ifdef WebView2Exe ?>
+      <ExePackage Id="WebView2Runtime"
+                  SourceFile="$(var.WebView2Exe)"
+                  DetectCondition="WebView2Version"
+                  InstallArguments="/silent /install"
+                  Permanent="yes"
+                  Vital="yes"
+                  Compressed="yes" />
+      <?endif?>
+
+      <!-- Install only the CUDA 12.1 runtime and cuBLAS. Nabrh does not need nvcc, Visual Studio
+           integration, samples, profilers or a driver package from the Toolkit installer. -->
+      <?ifdef CudaNetworkExe ?>
+      <ExePackage Id="CudaRuntime12_1"
+                  SourceFile="$(var.CudaNetworkExe)"
+                  DownloadUrl="https://developer.download.nvidia.com/compute/cuda/12.1.0/network_installers/cuda_12.1.0_windows_network.exe"
+                  DetectCondition="CudaToolkit12_1Installed = 1"
+                  InstallArguments="-s cudart_12.1 cublas_12.1 -n"
+                  RepairArguments="-s cudart_12.1 cublas_12.1 -n"
+                  Permanent="yes"
+                  Vital="yes"
+                  Compressed="no" />
+      <?endif?>
+
+      <!-- Main Nabrh Application MSI -->
+      <MsiPackage Id="Nabrh_MSI"
+                  SourceFile="$(var.Nabrh.Package.TargetPath)"
+                  Compressed="yes"
+                  Visible="no"
+                  Vital="yes">
+        <MsiProperty Name="INSTALLFOLDER" Value="[InstallFolder]" />
+        <!-- Defence in depth: the MSI refuses a fresh install without the token obtained by the
+             bootstrapper. Existing-product maintenance/uninstall remains available. -->
+        <MsiProperty Name="NABRH_APPROVAL_TOKEN" Value="[NabrhApprovalToken]" />
+      </MsiPackage>
+    </Chain>
+
+  </Bundle>
+</Wix>

@@ -1,0 +1,11 @@
+﻿<!--
+This file contains the declaration of all the localizable strings.
+-->
+<!-- Codepage drives the MSI summary-information stream, which is ANSI-only. Left at the
+     en-US default (1252) it strips every Arabic character from the product name shown in
+     the file's summary metadata. 1256 is the Windows Arabic codepage. -->
+<WixLocalization xmlns="http://wixtoolset.org/schemas/v4/wxl" Culture="en-US" Codepage="1256">
+
+  <String Id="DowngradeError" Value="A newer version of [ProductName] is already installed." />
+
+</WixLocalization>

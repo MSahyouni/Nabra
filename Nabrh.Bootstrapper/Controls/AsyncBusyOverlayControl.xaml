@@ -1,0 +1,69 @@
+<UserControl x:Class="ERPUI.Controls.AsyncBusyOverlayControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="600"
+             FlowDirection="RightToLeft">
+
+    <Grid x:Name="OverlayRoot">
+        <!-- Semi-transparent Dark Backdrop -->
+        <Border Background="#B3000000" CornerRadius="16">
+            <Border.Effect>
+                <BlurEffect Radius="8" KernelType="Gaussian" />
+            </Border.Effect>
+        </Border>
+
+        <!-- Center Card Container -->
+        <Border HorizontalAlignment="Center" VerticalAlignment="Center"
+                Width="440" Padding="32,28"
+                Background="{DynamicResource CardBackgroundBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}"
+                BorderThickness="1"
+                CornerRadius="16">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="24" Color="#20000000" Direction="270" ShadowDepth="4" Opacity="0.4" />
+            </Border.Effect>
+
+            <StackPanel HorizontalAlignment="Center">
+                <!-- Icon Header -->
+                <Border Width="64" Height="64" CornerRadius="32"
+                        Background="{DynamicResource SurfaceTintBrush}"
+                        BorderBrush="{DynamicResource SurfaceTintBorderBrush}"
+                        BorderThickness="1"
+                        HorizontalAlignment="Center" Margin="0,0,0,16">
+                    <ui:SymbolIcon Symbol="{Binding SymbolIcon, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                                   FontSize="32" Foreground="{DynamicResource PrimaryButtonBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+
+                <!-- Status Title -->
+                <TextBlock Text="{Binding StatusTitle, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           FontSize="16" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}"
+                           TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,8" />
+
+                <!-- SubStatus Description -->
+                <TextBlock Text="{Binding SubStatusMessage, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           FontSize="13" Foreground="{DynamicResource SecondaryTextBrush}"
+                           TextAlignment="Center" TextWrapping="Wrap" Margin="0,0,0,20" />
+
+                <!-- Progress Bar -->
+                <ProgressBar Height="6" Margin="0,0,0,20"
+                             IsIndeterminate="{Binding IsIndeterminate, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                             Value="{Binding ProgressValue, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                             Maximum="100"
+                             Foreground="{DynamicResource PrimaryButtonBrush}" />
+
+                <!-- Cancel Button -->
+                <Button Content="إلغاء العملية"
+                        Command="{Binding CancelCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        Style="{DynamicResource SecondaryOutlineButtonStyle}"
+                        Height="38" Padding="24,0"
+                        HorizontalAlignment="Center" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>
+

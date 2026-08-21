@@ -528,7 +528,7 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
 
         {/* {showPlayback && recordingPath && (
         <div className="text-sm text-gray-600 px-4">
-          Recording saved to: {recordingPath}
+          حُفظ التسجيل في: <span data-direction="ltr">{recordingPath}</span>
         </div>
       )} */}
       </div>

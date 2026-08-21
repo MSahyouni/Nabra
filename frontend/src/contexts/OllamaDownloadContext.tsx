@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { listen } from '@tauri-apps/api/event';
 import { toast } from 'sonner';
+import { normalizeDownloadProgress } from '@/lib/download-progress';
 
 /**
  * Ollama download state synchronized with backend
@@ -51,7 +52,12 @@ export function OllamaDownloadProvider({ children }: { children: React.ReactNode
         const unlistenProgress = await listen<{ modelName: string; progress: number }>(
           'ollama-model-download-progress',
           (event) => {
-            const { modelName, progress } = event.payload;
+            const { modelName } = event.payload;
+            const progress = normalizeDownloadProgress(event.payload.progress);
+            if (progress === null) {
+              console.warn(`[OllamaDownloadContext] Ignored invalid progress for ${modelName}`);
+              return;
+            }
             console.log(`🔵 [OllamaDownloadContext] Progress for ${modelName}: ${progress}%`);
 
             setDownloadProgress(prev => {

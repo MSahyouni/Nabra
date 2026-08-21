@@ -1,0 +1,74 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <!-- OOP BA is launched by Burn as its own process; publish per-RID so mbanative.dll resolves. -->
+    <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <!-- Burn starts the BA process BEFORE it executes any chain package, so chaining the .NET
+         Desktop Runtime cannot help this executable: on a machine without .NET 10 the wizard
+         would never appear at all. Shipping the runtime inside the BA removes that dependency
+         entirely (~70 MB, already dwarfed by the 73 MB payload MSI). -->
+    <SelfContained>true</SelfContained>
+    <!-- Trimming is unsafe here: WPF + XAML resource lookup is reflection-driven. -->
+    <PublishTrimmed>false</PublishTrimmed>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>app.ico</ApplicationIcon>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <EnableDefaultPageItems>false</EnableDefaultPageItems>
+    <EnableDefaultApplicationDefinition>false</EnableDefaultApplicationDefinition>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="NabrhBootstrapperApplication.cs" />
+    <Compile Include="ViewModels\BootstrapperWizardViewModel.cs" />
+    <Compile Include="Services\InstallerLogService.cs" />
+    <Compile Include="Services\UpdateService.cs" />
+    <Compile Include="Services\LicenseValidator.cs" />
+    <Compile Include="Services\InstallerProtection.cs" />
+    <Compile Include="Services\CudaPrerequisiteService.cs" />
+    <Compile Include="Services\SystemAdminApprovalService.cs" />
+    <Compile Include="Models\InstallerExitCode.cs" />
+    <Compile Include="Helpers\WizardConverters.cs" />
+    <Compile Include="Views\MainWindow.xaml.cs" />
+    <Page Include="Views\MainWindow.xaml" SubType="Designer" Generator="MSBuild:Compile" />
+    <Page Include="Resources\Converters.xaml" SubType="Designer" Generator="MSBuild:Compile" />
+    <Page Include="Resources\BootstrapperResources.xaml" SubType="Designer" Generator="MSBuild:Compile" />
+    <Page Include="Resources\GovernanceTheme.xaml" SubType="Designer" Generator="MSBuild:Compile" />
+  </ItemGroup>
+
+  <!-- Brand assets consumed by GovernanceTheme.xaml + the wizard rail (Qomra font, bg pattern, icon) -->
+  <ItemGroup>
+    <Resource Include="Assets\itfQomraArabic-Regular.otf" />
+    <Resource Include="Assets\itfQomraArabic-Medium.otf" />
+    <Resource Include="Assets\itfQomraArabic-Light.otf" />
+    <Resource Include="Assets\itfQomraArabic-Bold.otf" />
+    <Resource Include="Assets\figma\senior-management-bg-pattern.png" />
+    <Resource Include="Assets\figma\send-notification-bg-pattern.png" />
+    <Resource Include="Assets\branding\syrian-logo-icon-gold.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="app.ico" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <WixAcceptOSMF>true</WixAcceptOSMF>
+    <AcceptEula>wix7</AcceptEula>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WPF-UI" Version="4.2.0" />
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <!-- Single merged SDK package (Mba.Core + BalUtil were folded into it in WiX v5).
+         This version MUST match the WiX SDK/toolset used to build Nabrh.Installer (v7.0.0):
+         Burn <-> BA is a native ABI via mbanative.dll, and a mismatch fails at runtime. -->
+    <PackageReference Include="WixToolset.BootstrapperApplicationApi" Version="7.0.0" />
+  </ItemGroup>
+
+</Project>

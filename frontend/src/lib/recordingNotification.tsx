@@ -33,7 +33,7 @@ export async function showRecordingNotification(): Promise<void> {
                 }}
                 className="rounded border-gray-300 text-blue-600 focus:ring-blue-500 focus:ring-2"
               />
-              <span className="select-none text-gray-700">Don't show this again</span>
+              <span className="select-none text-gray-700">عدم إظهار هذا التنبيه مجدداً</span>
             </label>
             <button
               onClick={async () => {

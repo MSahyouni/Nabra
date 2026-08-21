@@ -1,0 +1,646 @@
+<ui:FluentWindow x:Class="Nabrh.Bootstrapper.Views.MainWindow"
+                  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                  xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                  xmlns:helpers="clr-namespace:Nabrh.Bootstrapper.Helpers"
+                  mc:Ignorable="d"
+                  Title="نبرة — معالج التثبيت"
+                  Height="600" Width="880"
+                  MinHeight="560" MinWidth="800"
+                  WindowStartupLocation="CenterScreen"
+                  FlowDirection="RightToLeft"
+                  Language="ar-SY"
+                  SnapsToDevicePixels="True" UseLayoutRounding="True"
+                  RenderOptions.BitmapScalingMode="HighQuality">
+
+  <ui:FluentWindow.Resources>
+    <ResourceDictionary>
+      <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/Resources/Converters.xaml" />
+      </ResourceDictionary.MergedDictionaries>
+
+      <BooleanToVisibilityConverter x:Key="BoolToVis" />
+      <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis" />
+      <helpers:BoolToSymbolConverter x:Key="BoolToSymbol" />
+      <helpers:BoolToStatusBrushConverter x:Key="BoolToStatusBrush" />
+      <helpers:RailBadgeBackgroundConverter x:Key="RailBadgeBg" />
+      <helpers:RailBadgeForegroundConverter x:Key="RailBadgeFg" />
+      <helpers:PrerequisiteSymbolConverter x:Key="PrereqSymbol" />
+      <helpers:PrerequisiteBrushConverter x:Key="PrereqBrush" />
+
+      <!-- Reusable card style for page content -->
+      <Style x:Key="WizardCard" TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="{DynamicResource CardCornerRadius}" />
+        <Setter Property="Padding" Value="24,20" />
+      </Style>
+
+      <!-- ============================ Navigation rail item ============================ -->
+      <DataTemplate x:Key="RailItemTemplate">
+        <DataTemplate.Resources>
+          <BooleanToVisibilityConverter x:Key="BoolToVis" />
+          <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis" />
+          <helpers:RailBadgeBackgroundConverter x:Key="RailBadgeBg" />
+          <helpers:RailBadgeForegroundConverter x:Key="RailBadgeFg" />
+        </DataTemplate.Resources>
+        <Grid Margin="0,1" Height="38">
+          <Border Width="4" HorizontalAlignment="Left" CornerRadius="2"
+                  Background="{DynamicResource AccentGoldBrush}"
+                  Visibility="{Binding IsActive, Converter={StaticResource BoolToVis}}" />
+          <Grid Margin="18,0,14,0">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="28" />
+              <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Border Grid.Column="0" Width="24" Height="24" CornerRadius="12"
+                    HorizontalAlignment="Left" VerticalAlignment="Center">
+              <Border.Background>
+                <MultiBinding Converter="{StaticResource RailBadgeBg}">
+                  <Binding Path="IsActive" />
+                  <Binding Path="IsDone" />
+                </MultiBinding>
+              </Border.Background>
+              <Grid>
+                <TextBlock Text="{Binding Number}" FontSize="12"
+                           Foreground="{Binding IsActive, Converter={StaticResource RailBadgeFg}}"
+                           Visibility="{Binding IsDone, Converter={StaticResource InverseBoolToVis}}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                <ui:SymbolIcon Symbol="Checkmark24" FontSize="14"
+                               Foreground="#042623"
+                               Visibility="{Binding IsDone, Converter={StaticResource BoolToVis}}"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+              </Grid>
+            </Border>
+            <TextBlock Grid.Column="1" Text="{Binding Title}" FontSize="13.5"
+                       Margin="10,0,0,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                       Foreground="{DynamicResource SidebarTextBrush}" />
+          </Grid>
+        </Grid>
+      </DataTemplate>
+
+      <!-- ============================ Step 1: Welcome ============================ -->
+      <DataTemplate x:Key="WelcomeTemplate">
+        <StackPanel>
+          <Border Style="{DynamicResource WizardCard}">
+            <StackPanel>
+              <TextBlock Text="نبرة (Nabrh) — المساعد الذكي للاجتماعات"
+                         FontSize="17" FontWeight="Bold" Foreground="{DynamicResource PrimaryTextBrush}" />
+              <TextBlock Margin="0,10,0,0" LineHeight="24" TextWrapping="Wrap"
+                         Foreground="{DynamicResource SecondaryTextBrush}"
+                         Text="مرحباً بك في معالج تثبيت نبرة. يوفّر لك هذا التطبيق بيئة ذكاء اصطناعي محلية وآمنة بالكامل لتسجيل وتفريغ ملخصات الاجتماعات باللغة العربية والإنجليزية، مع حماية تامة للبيانات دون الحاجة للاتصال بالسحابة." />
+            </StackPanel>
+          </Border>
+
+          <Border Style="{DynamicResource WizardCard}" Margin="0,16,0,0">
+            <StackPanel>
+              <TextBlock Text="الميزات الرئيسية للإصدار:" FontWeight="SemiBold"
+                         Foreground="{DynamicResource PrimaryTextBrush}" />
+              <Grid Margin="0,12,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                  <TextBlock Text="✓ تفريغ فوري بالذكاء الاصطناعي (Whisper)" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,3" />
+                  <TextBlock Text="✓ تلخيص ذكي للنقاط والقرارات" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,3" />
+                </StackPanel>
+                <StackPanel Grid.Column="1">
+                  <TextBlock Text="✓ خصوصية كاملة وعمل محلي (Local AI)" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,3" />
+                  <TextBlock Text="✓ أداء فائق وتكامل مع Windows" Foreground="{DynamicResource SecondaryTextBrush}" Margin="0,3" />
+                </StackPanel>
+              </Grid>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </DataTemplate>
+
+      <!-- ============================ Step 2: License ============================ -->
+      <DataTemplate x:Key="LicenseTemplate">
+        <StackPanel>
+          <Border Style="{DynamicResource WizardCard}" Padding="16">
+            <ScrollViewer Height="240" VerticalScrollBarVisibility="Auto">
+              <TextBox Text="{Binding LicenseText, Mode=OneTime}"
+                       TextWrapping="Wrap" IsReadOnly="True" BorderThickness="0"
+                       Background="Transparent" FontSize="13.5"
+                       Foreground="{DynamicResource PrimaryTextBrush}" />
+            </ScrollViewer>
+          </Border>
+          <CheckBox IsChecked="{Binding LicenseAccepted}" Margin="4,16,0,0"
+                    Content="أوافق على جميع بنود وشروط اتفاقية الترخيص المذكورة أعلاه."
+                    FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" />
+        </StackPanel>
+      </DataTemplate>
+
+      <!-- ============================ Step 3: Central administrator approval ============================ -->
+      <DataTemplate x:Key="ActivationTemplate">
+        <DataTemplate.Resources>
+          <BooleanToVisibilityConverter x:Key="BoolToVis" />
+          <helpers:BoolToSymbolConverter x:Key="BoolToSymbol" />
+          <helpers:BoolToStatusBrushConverter x:Key="BoolToStatusBrush" />
+        </DataTemplate.Resources>
+        <StackPanel>
+          <Border Style="{DynamicResource WizardCard}">
+            <StackPanel>
+              <TextBlock Text="تصريح مشرفي النظام" FontWeight="SemiBold"
+                         Foreground="{DynamicResource PrimaryTextBrush}" />
+              <TextBlock Margin="0,6,0,14" TextWrapping="Wrap" Foreground="{DynamicResource SecondaryTextBrush}"
+                         Text="أدخل رمز التصريح الذي أصدره مشرف النظام. سيتحقق معالج نبرة منه عبر سيرفر الموافقات المؤسسي، ولن يبدأ التثبيت إذا تعذّر الاتصال أو رُفض الطلب." />
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:TextBox Grid.Column="0" Text="{Binding LicenseKey, UpdateSourceTrigger=PropertyChanged}"
+                            PlaceholderText="أدخل رمز تصريح التثبيت"
+                            FontSize="15" MinHeight="44" />
+                <ui:Button Grid.Column="1" Content="طلب الموافقة" Margin="12,0,0,0" Width="140" Height="44"
+                            Appearance="Primary" Command="{Binding ValidateLicenseCommand}" />
+              </Grid>
+              <StackPanel Orientation="Horizontal" Margin="2,14,0,0"
+                          Visibility="{Binding LicenseChecked, Converter={StaticResource BoolToVis}}">
+                <ui:SymbolIcon Symbol="{Binding IsLicenseValid, Converter={StaticResource BoolToSymbol}}"
+                               Foreground="{Binding IsLicenseValid, Converter={StaticResource BoolToStatusBrush}}" />
+                <TextBlock Text="{Binding LicenseStatusMessage}" Margin="8,0,0,0"
+                           VerticalAlignment="Center"
+                           Foreground="{Binding IsLicenseValid, Converter={StaticResource BoolToStatusBrush}}" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <Border Style="{DynamicResource WizardCard}" Margin="0,16,0,0" Background="{DynamicResource SurfaceTintBrush}">
+            <TextBlock TextWrapping="Wrap" LineHeight="22" Foreground="{DynamicResource SecondaryTextBrush}"
+                        Text="سياسة الأمان: التحقق Fail-Closed؛ لا توجد فترة تجريبية أو إمكانية لتجاوز موافقة المشرف. لا يحتاج إلغاء التثبيت إلى هذا التصريح." />
+          </Border>
+        </StackPanel>
+      </DataTemplate>
+
+      <!-- ============================ Step 4: Prerequisites ============================ -->
+      <DataTemplate x:Key="PrerequisitesTemplate">
+        <DataTemplate.Resources>
+          <helpers:InverseBoolToVisibilityConverter x:Key="InverseBoolToVis" />
+          <helpers:PrerequisiteSymbolConverter x:Key="PrereqSymbol" />
+          <helpers:PrerequisiteBrushConverter x:Key="PrereqBrush" />
+        </DataTemplate.Resources>
+        <StackPanel>
+          <Border Style="{DynamicResource WizardCard}" Padding="8,4">
+            <ScrollViewer MaxHeight="390" VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled" FlowDirection="RightToLeft">
+              <ItemsControl ItemsSource="{Binding Prerequisites}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Grid Margin="16,14">
+                      <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="28" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="190" />
+                      </Grid.ColumnDefinitions>
+                      <ui:SymbolIcon Grid.Column="0" VerticalAlignment="Center">
+                        <ui:SymbolIcon.Symbol>
+                          <MultiBinding Converter="{StaticResource PrereqSymbol}">
+                            <Binding Path="IsOk" />
+                            <Binding Path="IsBlocking" />
+                          </MultiBinding>
+                        </ui:SymbolIcon.Symbol>
+                        <ui:SymbolIcon.Foreground>
+                          <MultiBinding Converter="{StaticResource PrereqBrush}">
+                            <Binding Path="IsOk" />
+                            <Binding Path="IsBlocking" />
+                          </MultiBinding>
+                        </ui:SymbolIcon.Foreground>
+                      </ui:SymbolIcon>
+                      <TextBlock Grid.Column="1" Text="{Binding Title}" Margin="10,0,16,0"
+                                 VerticalAlignment="Center" TextWrapping="Wrap" LineHeight="22"
+                                 FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" />
+                      <TextBlock Grid.Column="2" Text="{Binding StatusText}" VerticalAlignment="Center"
+                                 TextWrapping="Wrap" LineHeight="21" TextAlignment="Right"
+                                 Foreground="{DynamicResource SecondaryTextBrush}" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+          </Border>
+          <Grid Margin="0,16,0,0">
+            <ui:Button Content="إعادة الفحص" HorizontalAlignment="Left" Appearance="Secondary"
+                       Command="{Binding RecheckPrerequisitesCommand}" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center"
+                        Visibility="{Binding PrerequisitesPassed, Converter={StaticResource InverseBoolToVis}}">
+              <ui:SymbolIcon Symbol="Warning24" Foreground="{DynamicResource StatusRedBrush}" />
+              <TextBlock Text="بعض المتطلبات الأساسية غير متوفّرة" Margin="8,0,0,0" VerticalAlignment="Center"
+                         Foreground="{DynamicResource StatusRedBrush}" />
+            </StackPanel>
+          </Grid>
+        </StackPanel>
+      </DataTemplate>
+
+      <!-- ============================ Step 5: Location ============================ -->
+      <DataTemplate x:Key="LocationTemplate">
+        <DataTemplate.Resources>
+          <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        </DataTemplate.Resources>
+        <StackPanel>
+          <Border Style="{DynamicResource WizardCard}">
+            <StackPanel>
+              <TextBlock Text="مجلد التثبيت" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" />
+              <Grid Margin="0,12,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ui:TextBox Grid.Column="0" Text="{Binding InstallPath}" MinHeight="44" />
+                <ui:Button Grid.Column="1" Content="استعراض..." Margin="12,0,0,0" Width="120" Height="44"
+                           Appearance="Secondary" Command="{Binding BrowseFolderCommand}" />
+              </Grid>
+            </StackPanel>
+          </Border>
+          <Border Style="{DynamicResource WizardCard}" Margin="0,16,0,0">
+            <StackPanel>
+              <TextBlock Text="نطاق التثبيت" FontWeight="SemiBold" Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,10" />
+              <RadioButton GroupName="Scope" Content="لكل مستخدمي هذا الجهاز (يتطلب صلاحيات المسؤول)"
+                           IsChecked="{Binding PerMachine}"
+                           Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4" />
+              <RadioButton GroupName="Scope" Content="للمستخدم الحالي فقط"
+                           Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,4" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </DataTemplate>
+
+      <!-- ============================ Step 6: Components ============================ -->
+      <DataTemplate x:Key="ComponentsTemplate">
+        <Border Style="{DynamicResource WizardCard}">
+          <StackPanel>
+            <CheckBox IsChecked="{Binding InstallCore}" IsEnabled="False" Margin="0,6"
+                      Content="النواة الأساسية للنظام (مطلوبة)" FontWeight="Medium"
+                      Foreground="{DynamicResource PrimaryTextBrush}" />
+            <CheckBox IsChecked="{Binding CreateStartMenuShortcut}" Margin="0,6"
+                      Content="إنشاء اختصار في قائمة ابدأ" Foreground="{DynamicResource PrimaryTextBrush}" />
+            <CheckBox IsChecked="{Binding CreateDesktopShortcut}" Margin="0,6"
+                      Content="إنشاء اختصار على سطح المكتب" Foreground="{DynamicResource PrimaryTextBrush}" />
+            <CheckBox IsChecked="{Binding EnableAutoUpdate}" Margin="0,6"
+                      Content="تفعيل التحديث التلقائي (يتحقّق من الإصدارات الجديدة الموقّعة)"
+                      Foreground="{DynamicResource PrimaryTextBrush}" />
+          </StackPanel>
+        </Border>
+      </DataTemplate>
+
+      <!-- ============================ Step 7: Security / protection ============================ -->
+      <DataTemplate x:Key="SecurityTemplate">
+        <StackPanel>
+          <Border Style="{DynamicResource WizardCard}">
+            <StackPanel>
+              <CheckBox IsChecked="{Binding EnableEncryption}" IsEnabled="False" Margin="0,6"
+                        Content="تشفير ملفات النظام (AES-256-GCM) — مطلوب" FontWeight="Medium"
+                        Foreground="{DynamicResource PrimaryTextBrush}" />
+              <CheckBox IsChecked="{Binding EnableObfuscation}" Margin="0,6"
+                        Content="تشويش رموز التجميعات (Obfuscation)" Foreground="{DynamicResource PrimaryTextBrush}" />
+              <CheckBox IsChecked="{Binding EnableAntiTamper}" Margin="0,6"
+                        Content="الحماية من العبث ومنع التشغيل المتزامن" Foreground="{DynamicResource PrimaryTextBrush}" />
+            </StackPanel>
+          </Border>
+          <Border Style="{DynamicResource WizardCard}" Margin="0,16,0,0" Background="{DynamicResource SurfaceTintBrush}">
+            <TextBlock TextWrapping="Wrap" LineHeight="22" Foreground="{DynamicResource SecondaryTextBrush}"
+                       Text="إفصاح أمني: التشفير والتشويش والحماية من العبث ترفع كلفة العبث العابر ولا تمنع مهاجماً محلياً متمكناً. الحماية الدائمة هي التوقيع الرقمي (Authenticode) والمرجعية الأمنية للخادم (Fort API)." />
+          </Border>
+        </StackPanel>
+      </DataTemplate>
+
+      <!-- ============================ Step 8: Summary ============================ -->
+      <DataTemplate x:Key="SummaryTemplate">
+        <DataTemplate.Resources>
+          <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        </DataTemplate.Resources>
+        <Border Style="{DynamicResource WizardCard}">
+          <StackPanel>
+            <TextBlock Text="ملخّص إعدادات التثبيت" FontWeight="SemiBold" FontSize="15"
+                       Foreground="{DynamicResource PrimaryTextBrush}" Margin="0,0,0,14" />
+            <Grid Margin="0,5">
+              <TextBlock Text="مجلد التثبيت" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Left" />
+              <TextBlock Text="{Binding InstallPath}" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Right" />
+            </Grid>
+            <Grid Margin="0,5">
+              <TextBlock Text="نطاق التثبيت" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Left" />
+              <TextBlock Text="لكل الأجهزة" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Right"
+                         Visibility="{Binding PerMachine, Converter={StaticResource BoolToVis}}" />
+            </Grid>
+            <Grid Margin="0,5">
+              <TextBlock Text="تصريح مشرف النظام" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Left" />
+              <TextBlock Text="موافق عليه ✓" Foreground="{DynamicResource StatusGreenBrush}" HorizontalAlignment="Right" />
+            </Grid>
+            <Grid Margin="0,5">
+              <TextBlock Text="التحديث التلقائي" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Left" />
+              <TextBlock Text="مفعّل" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Right"
+                         Visibility="{Binding EnableAutoUpdate, Converter={StaticResource BoolToVis}}" />
+            </Grid>
+            <Grid Margin="0,5">
+              <TextBlock Text="التشفير والحماية" Foreground="{DynamicResource SecondaryTextBrush}" HorizontalAlignment="Left" />
+              <TextBlock Text="AES-256-GCM + حماية من العبث" Foreground="{DynamicResource PrimaryTextBrush}" HorizontalAlignment="Right" />
+            </Grid>
+            <Border Height="1" Background="{DynamicResource CardBorderBrush}" Margin="0,14" />
+            <TextBlock TextWrapping="Wrap" Foreground="{DynamicResource SecondaryTextBrush}"
+                       Text="اضغط «تثبيت الآن» لبدء العملية. قد يُطلب رفع الصلاحيات (UAC)." />
+          </StackPanel>
+        </Border>
+      </DataTemplate>
+
+      <!-- ============================ Uninstall confirmation ============================ -->
+      <DataTemplate x:Key="UninstallConfirmTemplate">
+        <StackPanel>
+          <Border Style="{DynamicResource WizardCard}">
+            <StackPanel>
+              <ui:SymbolIcon Symbol="Delete24" FontSize="38" HorizontalAlignment="Center"
+                             Foreground="{DynamicResource AccentGoldBrush}" />
+              <TextBlock Text="هل تريد إزالة تطبيق نبرة من هذا الجهاز؟"
+                         Margin="0,16,0,0" FontSize="17" FontWeight="SemiBold"
+                         TextAlignment="Center" Foreground="{DynamicResource PrimaryTextBrush}" />
+              <TextBlock Margin="0,14,0,0" TextWrapping="Wrap" LineHeight="24"
+                         Foreground="{DynamicResource SecondaryTextBrush}"
+                         Text="ستُزال ملفات التطبيق والاختصارات ومكوّنات التثبيت. لن يحذف المعالج تسجيلات الاجتماعات أو التفريغات أو المستندات التي أنشأها المستخدم." />
+              <Border Height="1" Background="{DynamicResource CardBorderBrush}" Margin="0,18,0,14" />
+              <CheckBox IsChecked="{Binding UninstallConfirmed}"
+                        Content="أفهم أثر العملية وأؤكد إزالة تطبيق نبرة."
+                        FontWeight="Medium" Foreground="{DynamicResource PrimaryTextBrush}" />
+            </StackPanel>
+          </Border>
+          <Border Style="{DynamicResource WizardCard}" Margin="0,16,0,0" Background="{DynamicResource SurfaceTintBrush}">
+            <StackPanel Orientation="Horizontal">
+              <ui:SymbolIcon Symbol="ShieldCheckmark24" Foreground="{DynamicResource StatusGreenBrush}" />
+              <TextBlock Margin="8,0,0,0" TextWrapping="Wrap" LineHeight="22"
+                         Foreground="{DynamicResource SecondaryTextBrush}"
+                         Text="يمكن للمستخدم إزالة التطبيق بأمان دون الاتصال بسيرفر الموافقات أو إدخال رمز المشرف." />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </DataTemplate>
+
+      <!-- ============================ Step 9: Installing ============================ -->
+      <DataTemplate x:Key="InstallingTemplate">
+        <DataTemplate.Resources>
+          <helpers:StringToVisibilityConverter x:Key="StringToVis" />
+          <helpers:ActivityBrushConverter x:Key="ActivityBrush" />
+        </DataTemplate.Resources>
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+          </Grid.RowDefinitions>
+
+          <!-- Headline status + progress -->
+          <Border Grid.Row="0" Style="{DynamicResource WizardCard}">
+            <StackPanel>
+              <ui:ProgressRing IsIndeterminate="True" Width="52" Height="52" HorizontalAlignment="Center"
+                               Foreground="{DynamicResource AccentFillColorDefaultBrush}" />
+
+              <TextBlock Text="{Binding StatusMessage}" Margin="0,20,0,0" HorizontalAlignment="Center"
+                         FontSize="15" FontWeight="Medium" TextWrapping="Wrap" TextAlignment="Center"
+                         Foreground="{DynamicResource PrimaryTextBrush}" />
+
+              <!-- Which package/phase, kept separate so progress ticks cannot overwrite it -->
+              <TextBlock Text="{Binding StatusDetail}" Margin="0,6,0,0" HorizontalAlignment="Center"
+                         FontSize="12.5" TextWrapping="Wrap" TextAlignment="Center"
+                         Foreground="{DynamicResource SecondaryTextBrush}"
+                         Visibility="{Binding StatusDetail, Converter={StaticResource StringToVis}}" />
+
+              <Grid Margin="0,16,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <ProgressBar Grid.Column="0" Height="12" VerticalAlignment="Center"
+                             Value="{Binding ProgressPercentage}" Maximum="100"
+                             Foreground="{DynamicResource StatusGreenBrush}"
+                             Background="{DynamicResource ProgressTrackBrush}" />
+                <TextBlock Grid.Column="1" Text="{Binding ProgressText}" Margin="12,0,0,0"
+                           MinWidth="42" TextAlignment="Left" VerticalAlignment="Center"
+                           FontSize="13" FontWeight="SemiBold"
+                           Foreground="{DynamicResource PrimaryTextBrush}" />
+              </Grid>
+            </StackPanel>
+          </Border>
+
+          <!-- Live activity so a failure shows how far it got and what it was doing -->
+          <Border Grid.Row="1" Style="{DynamicResource WizardCard}" Margin="0,14,0,0"
+                  Background="{DynamicResource SurfaceTintBrush}">
+            <Grid>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+              </Grid.RowDefinitions>
+
+              <TextBlock Grid.Row="0" Text="سجلّ العملية" FontSize="12.5" FontWeight="SemiBold"
+                         Margin="0,0,0,8" Foreground="{DynamicResource SecondaryTextBrush}" />
+
+              <ScrollViewer Grid.Row="1" x:Name="ActivityScroller"
+                            VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl ItemsSource="{Binding Activity}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                      <Grid Margin="0,2">
+                        <Grid.ColumnDefinitions>
+                          <ColumnDefinition Width="Auto" />
+                          <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="{Binding Timestamp}" FontSize="11.5"
+                                   FontFamily="Consolas, Courier New" FlowDirection="LeftToRight"
+                                   VerticalAlignment="Top" Margin="0,1,10,0"
+                                   Foreground="{DynamicResource SecondaryTextBrush}" />
+                        <TextBlock Grid.Column="1" Text="{Binding Text}" FontSize="12.5"
+                                   TextWrapping="Wrap"
+                                   Foreground="{Binding IsError, Converter={StaticResource ActivityBrush}}" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </ScrollViewer>
+            </Grid>
+          </Border>
+        </Grid>
+      </DataTemplate>
+
+      <!-- ============================ Step 10: Completed ============================ -->
+      <DataTemplate x:Key="CompletedTemplate">
+        <Border Style="{DynamicResource WizardCard}" VerticalAlignment="Center">
+          <StackPanel HorizontalAlignment="Center">
+            <Border Width="72" Height="72" CornerRadius="36" Background="{DynamicResource RoleGreenBgBrush}" HorizontalAlignment="Center">
+              <ui:SymbolIcon Symbol="Checkmark24" FontSize="38" Foreground="{DynamicResource StatusGreenBrush}"
+                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Text="{Binding ResultTitle}" FontSize="18" FontWeight="SemiBold" Margin="0,18,0,8"
+                       HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryTextBrush}" />
+            <TextBlock Text="{Binding ResultMessage}" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="440"
+                       Foreground="{DynamicResource SecondaryTextBrush}" />
+          </StackPanel>
+        </Border>
+      </DataTemplate>
+
+      <!-- ============================ Step 11: Failed ============================ -->
+      <DataTemplate x:Key="FailedTemplate">
+        <Border Style="{DynamicResource WizardCard}" VerticalAlignment="Center">
+          <StackPanel HorizontalAlignment="Center">
+            <Border Width="72" Height="72" CornerRadius="36" Background="#FDECEC" HorizontalAlignment="Center">
+              <ui:SymbolIcon Symbol="Dismiss24" FontSize="36" Foreground="{DynamicResource StatusRedBrush}"
+                             HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Border>
+            <TextBlock Text="{Binding ResultTitle}" FontSize="18" FontWeight="SemiBold" Margin="0,18,0,8"
+                       HorizontalAlignment="Center" Foreground="{DynamicResource PrimaryTextBrush}" />
+            <TextBlock Text="{Binding ResultMessage}" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="440"
+                       Foreground="{DynamicResource SecondaryTextBrush}" />
+          </StackPanel>
+        </Border>
+      </DataTemplate>
+    </ResourceDictionary>
+  </ui:FluentWindow.Resources>
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto" />
+      <RowDefinition Height="*" />
+    </Grid.RowDefinitions>
+
+    <!-- Custom title bar -->
+    <ui:TitleBar Grid.Row="0" Title="نبرة — معالج التثبيت" ShowMaximize="False" />
+
+    <Grid Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <!-- RTL: Column 0 renders at the visual right for the Nabrh navigation rail. -->
+        <ColumnDefinition Width="286" />
+        <ColumnDefinition Width="*" />
+      </Grid.ColumnDefinitions>
+
+      <!-- ==================== Emerald navigation rail ==================== -->
+      <Border Grid.Column="0" Background="{DynamicResource SidebarBackgroundBrush}">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+
+          <!-- Brand header -->
+          <StackPanel Grid.Row="0" Margin="24,26,24,20">
+            <Image Source="pack://application:,,,/Assets/branding/syrian-logo-icon-gold.png" Width="52" Height="52"
+                   HorizontalAlignment="Left" FlowDirection="LeftToRight"
+                   RenderOptions.BitmapScalingMode="HighQuality" />
+            <TextBlock Text="نبرة" FontSize="22" FontWeight="Bold" Margin="0,14,0,0"
+                       Foreground="{DynamicResource AccentGoldBrush}" />
+            <TextBlock Text="المساعد الذكي للاجتماعات" FontSize="12.5" Margin="0,4,0,0"
+                       Foreground="{DynamicResource SidebarTextBrush}" />
+          </StackPanel>
+
+          <!-- Keep the footer in its own row. Scrolling here prevents short windows or high
+               display scaling from drawing the final steps underneath the privacy card. -->
+          <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                        HorizontalScrollBarVisibility="Disabled" Margin="0,4">
+            <ItemsControl ItemsSource="{Binding Steps}"
+                          ItemTemplate="{StaticResource RailItemTemplate}" />
+          </ScrollViewer>
+
+          <!-- Security note footer -->
+          <Border Grid.Row="2" Margin="18,16" Padding="14,12" Background="{DynamicResource SidebarCardBrush}" CornerRadius="8">
+            <StackPanel Orientation="Horizontal">
+              <ui:SymbolIcon Symbol="ShieldCheckmark24" FontSize="18" Foreground="{DynamicResource AccentGoldBrush}" />
+              <TextBlock Text="حماية الخصوصية والذكاء المحلي" Margin="8,0,0,0" VerticalAlignment="Center"
+                         FontSize="12" Foreground="{DynamicResource SidebarTextBrush}" />
+            </StackPanel>
+          </Border>
+        </Grid>
+      </Border>
+
+      <!-- ==================== Main wizard content area ==================== -->
+      <Grid Grid.Column="1" Background="{DynamicResource PageBackgroundBrush}">
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto" />
+          <RowDefinition Height="*" />
+          <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="34,28,34,10">
+          <TextBlock Text="{Binding StepTitle}" FontSize="21" FontWeight="Bold"
+                     Foreground="{DynamicResource HeaderTitleBrush}" />
+          <TextBlock Text="{Binding StepSubtitle}" FontSize="13.5" Margin="0,6,0,0"
+                     TextWrapping="Wrap" Foreground="{DynamicResource HeaderSubtitleBrush}" />
+          <Border Height="1" Background="{DynamicResource CardBorderBrush}" Margin="0,18,0,0" />
+        </StackPanel>
+
+        <!-- Body: page content switched by CurrentStep -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="34,14,34,10">
+          <ContentControl Content="{Binding}">
+            <ContentControl.Style>
+              <Style TargetType="ContentControl">
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding CurrentStep}" Value="Welcome">
+                    <Setter Property="ContentTemplate" Value="{StaticResource WelcomeTemplate}" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding CurrentStep}" Value="License">
+                    <Setter Property="ContentTemplate" Value="{StaticResource LicenseTemplate}" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding CurrentStep}" Value="Activation">
+                    <Setter Property="ContentTemplate" Value="{StaticResource ActivationTemplate}" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding CurrentStep}" Value="Prerequisites">
+                    <Setter Property="ContentTemplate" Value="{StaticResource PrerequisitesTemplate}" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding CurrentStep}" Value="Location">
+                    <Setter Property="ContentTemplate" Value="{StaticResource LocationTemplate}" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding CurrentStep}" Value="Components">
+                    <Setter Property="ContentTemplate" Value="{StaticResource ComponentsTemplate}" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding CurrentStep}" Value="Security">
+                    <Setter Property="ContentTemplate" Value="{StaticResource SecurityTemplate}" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding CurrentStep}" Value="Summary">
+                    <Setter Property="ContentTemplate" Value="{StaticResource SummaryTemplate}" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding CurrentStep}" Value="UninstallConfirm">
+                    <Setter Property="ContentTemplate" Value="{StaticResource UninstallConfirmTemplate}" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding CurrentStep}" Value="Installing">
+                    <Setter Property="ContentTemplate" Value="{StaticResource InstallingTemplate}" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding CurrentStep}" Value="Completed">
+                    <Setter Property="ContentTemplate" Value="{StaticResource CompletedTemplate}" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding CurrentStep}" Value="Failed">
+                    <Setter Property="ContentTemplate" Value="{StaticResource FailedTemplate}" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </ContentControl.Style>
+          </ContentControl>
+        </ScrollViewer>
+
+        <!-- Footer action bar -->
+        <Border Grid.Row="2" Background="{DynamicResource SurfaceTintBrush}"
+                BorderBrush="{DynamicResource CardBorderBrush}" BorderThickness="0,1,0,0" Padding="34,16">
+          <Grid>
+            <ui:Button Content="إلغاء" HorizontalAlignment="Right" Width="110" Height="42"
+                       Appearance="Secondary" Command="{Binding CancelCommand}"
+                       Visibility="{Binding ShowCancel, Converter={StaticResource BoolToVis}}" />
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Left">
+              <ui:Button Content="السابق" Width="120" Height="42" Appearance="Secondary"
+                         Command="{Binding GoBackCommand}"
+                         Visibility="{Binding ShowBack, Converter={StaticResource BoolToVis}}" />
+              <ui:Button Content="التالي" Width="130" Height="42" Margin="12,0,0,0" Appearance="Primary"
+                         IsEnabled="{Binding CanGoNext}" Command="{Binding GoNextCommand}"
+                         Visibility="{Binding ShowNext, Converter={StaticResource BoolToVis}}" />
+              <ui:Button Content="{Binding PrimaryActionText}" Width="140" Height="42" Margin="12,0,0,0" Appearance="Primary"
+                         FontWeight="Bold" IsEnabled="{Binding CanGoNext}" Command="{Binding GoNextCommand}"
+                         Visibility="{Binding ShowInstall, Converter={StaticResource BoolToVis}}" />
+              <ui:Button Content="تشغيل النظام" Width="140" Height="42" Margin="12,0,0,0" Appearance="Primary"
+                         FontWeight="Bold" Command="{Binding LaunchAppCommand}"
+                         Visibility="{Binding ShowLaunch, Converter={StaticResource BoolToVis}}" />
+              <ui:Button Content="إنهاء" Width="120" Height="42" Margin="12,0,0,0" Appearance="Secondary"
+                         Command="{Binding FinishCommand}"
+                         Visibility="{Binding ShowFinish, Converter={StaticResource BoolToVis}}" />
+            </StackPanel>
+          </Grid>
+        </Border>
+      </Grid>
+    </Grid>
+  </Grid>
+</ui:FluentWindow>

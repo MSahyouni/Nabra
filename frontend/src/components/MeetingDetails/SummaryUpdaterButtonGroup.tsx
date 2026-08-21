@@ -2,7 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { ButtonGroup } from '@/components/ui/button-group';
-import { Copy, Save, Loader2, Search, FolderOpen } from 'lucide-react';
+import { Copy, Save, Loader2, FileDown } from 'lucide-react';
 import Analytics from '@/lib/analytics';
 
 interface SummaryUpdaterButtonGroupProps {
@@ -10,6 +10,8 @@ interface SummaryUpdaterButtonGroupProps {
   isDirty: boolean;
   onSave: () => Promise<void>;
   onCopy: () => Promise<void>;
+  onExportWord: () => Promise<void>;
+  isExportingWord: boolean;
   onFind?: () => void;
   onOpenFolder: () => Promise<void>;
   hasSummary: boolean;
@@ -20,6 +22,8 @@ export function SummaryUpdaterButtonGroup({
   isDirty,
   onSave,
   onCopy,
+  onExportWord,
+  isExportingWord,
   onFind,
   onOpenFolder,
   hasSummary
@@ -49,6 +53,20 @@ export function SummaryUpdaterButtonGroup({
             <span className="hidden lg:inline">حفظ</span>
           </>
         )}
+      </Button>
+
+      <Button
+        variant="outline"
+        size="sm"
+        title="Export summary and transcript to Microsoft Word"
+        onClick={() => {
+          Analytics.trackButtonClick('export_word', 'meeting_details');
+          void onExportWord();
+        }}
+        disabled={!hasSummary || isExportingWord}
+      >
+        {isExportingWord ? <Loader2 className="animate-spin" /> : <FileDown />}
+        <span className="hidden lg:inline">Word</span>
       </Button>
 
       {/* Copy button */}

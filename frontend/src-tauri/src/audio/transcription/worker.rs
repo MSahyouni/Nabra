@@ -49,7 +49,7 @@ pub fn start_transcription_task<R: Runtime>(
     tokio::spawn(async move {
         info!("🚀 Starting optimized parallel transcription task - guaranteeing zero chunk loss");
 
-        // Initialize transcription engine (Whisper or Parakeet based on config)
+        // Initialize the Whisper transcription engine.
         let transcription_engine = match super::engine::get_or_init_transcription_engine(&app).await {
             Ok(engine) => engine,
             Err(e) => {
@@ -80,8 +80,6 @@ pub fn start_transcription_task<R: Runtime>(
         for worker_id in 0..NUM_WORKERS {
             let engine_clone = match &transcription_engine {
                 TranscriptionEngine::Whisper(e) => TranscriptionEngine::Whisper(e.clone()),
-                TranscriptionEngine::Parakeet(e) => TranscriptionEngine::Parakeet(e.clone()),
-                TranscriptionEngine::Provider(p) => TranscriptionEngine::Provider(p.clone()),
             };
             let app_clone = app.clone();
             let work_receiver_clone = work_receiver.clone();
@@ -153,10 +151,7 @@ pub fn start_transcription_task<R: Runtime>(
                             {
                                 Ok((transcript, confidence_opt, is_partial)) => {
                                     // Provider-aware confidence threshold
-                                    let confidence_threshold = match &engine_clone {
-                                        TranscriptionEngine::Whisper(_) | TranscriptionEngine::Provider(_) => 0.3,
-                                        TranscriptionEngine::Parakeet(_) => 0.0, // Parakeet has no confidence, accept all
-                                    };
+                                    let confidence_threshold = 0.3;
 
                                     let confidence_str = match confidence_opt {
                                         Some(c) => format!("{:.2}", c),
@@ -403,7 +398,7 @@ pub fn start_transcription_task<R: Runtime>(
     })
 }
 
-/// Transcribe audio chunk using the appropriate provider (Whisper, Parakeet, or trait-based)
+/// Transcribe audio chunk using the Whisper provider.
 /// Returns: (text, confidence Option, is_partial)
 async fn transcribe_chunk_with_provider<R: Runtime>(
     engine: &TranscriptionEngine,
@@ -418,7 +413,10 @@ async fn transcribe_chunk_with_provider<R: Runtime>(
     };
 
     // Skip VAD processing here since the pipeline already extracted speech using VAD
-    let speech_samples = transcription_data;
+    let speech_samples = crate::audio::audio_processing::enhance_for_asr_light(
+        &transcription_data,
+        16000,
+    );
 
     // Check for empty samples - improved error handling
     if speech_samples.is_empty() {
@@ -482,90 +480,6 @@ async fn transcribe_chunk_with_provider<R: Runtime>(
                     );
 
                     Err(transcription_error)
-                }
-            }
-        }
-        TranscriptionEngine::Parakeet(parakeet_engine) => {
-            match parakeet_engine.transcribe_audio(speech_samples).await {
-                Ok(text) => {
-                    let cleaned_text = text.trim().to_string();
-                    if cleaned_text.is_empty() {
-                        return Ok((String::new(), None, false));
-                    }
-
-                    info!(
-                        "Parakeet transcription complete for chunk {}: '{}'",
-                        chunk.chunk_id, cleaned_text
-                    );
-
-                    // Parakeet doesn't provide confidence or partial results
-                    Ok((cleaned_text, None, false))
-                }
-                Err(e) => {
-                    error!(
-                        "Parakeet transcription failed for chunk {}: {}",
-                        chunk.chunk_id, e
-                    );
-
-                    let transcription_error = TranscriptionError::EngineFailed(e.to_string());
-                    let _ = app.emit(
-                        "transcription-error",
-                        &serde_json::json!({
-                            "error": transcription_error.to_string(),
-                            "userMessage": format!("Transcription failed: {}", transcription_error),
-                            "actionable": false
-                        }),
-                    );
-
-                    Err(transcription_error)
-                }
-            }
-        }
-        TranscriptionEngine::Provider(provider) => {
-            // NEW: Trait-based provider (clean, unified interface)
-            let language = crate::get_language_preference_internal();
-
-            match provider.transcribe(speech_samples, language).await {
-                Ok(result) => {
-                    let cleaned_text = result.text.trim().to_string();
-                    if cleaned_text.is_empty() {
-                        return Ok((String::new(), result.confidence, result.is_partial));
-                    }
-
-                    let confidence_str = match result.confidence {
-                        Some(c) => format!("confidence: {:.2}", c),
-                        None => "no confidence".to_string(),
-                    };
-
-                    info!(
-                        "{} transcription complete for chunk {}: '{}' ({}, partial: {})",
-                        provider.provider_name(),
-                        chunk.chunk_id,
-                        cleaned_text,
-                        confidence_str,
-                        result.is_partial
-                    );
-
-                    Ok((cleaned_text, result.confidence, result.is_partial))
-                }
-                Err(e) => {
-                    error!(
-                        "{} transcription failed for chunk {}: {}",
-                        provider.provider_name(),
-                        chunk.chunk_id,
-                        e
-                    );
-
-                    let _ = app.emit(
-                        "transcription-error",
-                        &serde_json::json!({
-                            "error": e.to_string(),
-                            "userMessage": format!("Transcription failed: {}", e),
-                            "actionable": false
-                        }),
-                    );
-
-                    Err(e)
                 }
             }
         }

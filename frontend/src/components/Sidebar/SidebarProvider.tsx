@@ -116,7 +116,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
   const baseItems: SidebarItem[] = [
     {
       id: 'meetings',
-      title: 'Meeting Notes',
+      title: 'ملاحظات الاجتماعات',
       type: 'folder' as const,
       children: [
         ...meetings.map(meeting => ({ id: meeting.id, title: meeting.title, type: 'file' as const }))
@@ -214,7 +214,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         });
         onUpdate({
           status: 'error',
-          error: 'Summary generation timed out after 15 minutes. Please try again or check your model configuration.'
+          error: 'انتهت مهلة إنشاء الملخص بعد 15 دقيقة. حاول مجددًا أو تحقق من إعداد النموذج.'
         });
         return;
       }
@@ -252,7 +252,7 @@ export function SidebarProvider({ children }: { children: React.ReactNode }) {
         // Report error to callback
         onUpdate({
           status: 'error',
-          error: error instanceof Error ? error.message : 'Unknown error'
+          error: error instanceof Error ? error.message : 'خطأ غير معروف'
         });
         clearInterval(pollInterval);
         setActiveSummaryPolls(prev => {

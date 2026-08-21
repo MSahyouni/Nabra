@@ -62,7 +62,7 @@ export function BuiltInModelManager({
       }
     } catch (error) {
       console.error('Failed to fetch built-in AI models:', error);
-      toast.error('Failed to load models');
+      toast.error('فشل تحميل النماذج');
     } finally {
       setIsLoading(false);
       setHasFetched(true);
@@ -127,7 +127,7 @@ export function BuiltInModelManager({
           });
           // Refresh models list
           fetchModels();
-          toast.success(`Model ${model} downloaded successfully`);
+          toast.success(`تم تنزيل النموذج ${model} بنجاح`);
         }
 
         // Handle cancelled status
@@ -216,7 +216,7 @@ export function BuiltInModelManager({
       }
 
       // For real errors, show toast and remove from downloading
-      toast.error(`Failed to download ${modelName}`);
+      toast.error(`فشل تنزيل ${modelName}`);
 
       setDownloadingModels((prev) => {
         const newSet = new Set(prev);
@@ -232,7 +232,7 @@ export function BuiltInModelManager({
   const cancelDownload = async (modelName: string) => {
     try {
       await invoke('builtin_ai_cancel_download', { modelName });
-      toast.info(`Download of ${modelName} cancelled`);
+      toast.info(`أُلغي تنزيل ${modelName}`);
       setDownloadingModels((prev) => {
         const newSet = new Set(prev);
         newSet.delete(modelName);
@@ -246,11 +246,11 @@ export function BuiltInModelManager({
   const deleteModel = async (modelName: string) => {
     try {
       await invoke('builtin_ai_delete_model', { modelName });
-      toast.success(`Model ${modelName} deleted`);
+      toast.success(`تم حذف النموذج ${modelName}`);
       fetchModels();
     } catch (error) {
       console.error('Failed to delete model:', error);
-      toast.error(`Failed to delete ${modelName}`);
+      toast.error(`فشل حذف ${modelName}`);
     }
   };
 
@@ -278,7 +278,7 @@ export function BuiltInModelManager({
   return (
     <div>
       <div className="flex items-center justify-between mb-4">
-        <h4 className="text-sm font-bold">Built-in AI Models</h4>
+        <h4 className="text-sm font-bold">نماذج الذكاء الاصطناعي المدمجة</h4>
       </div>
 
       <div
@@ -442,8 +442,8 @@ export function BuiltInModelManager({
                     {isError && typeof model.status === 'object' && 'Error' in model.status
                       ? (model.status as any).Error
                       : isCorrupted
-                      ? 'File is corrupted. Retry download or delete.'
-                      : 'An error occurred'}
+                      ? 'الملف تالف. أعد تنزيله أو احذفه.'
+                      : 'حدث خطأ'}
                   </p>
                 )}
                 <div className="text-xs text-gray-500">
@@ -456,7 +456,7 @@ export function BuiltInModelManager({
               {modelIsDownloading && progress !== undefined && (
                 <div className="mt-3 pt-3 border-t border-gray-200">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-sm font-medium text-gray-900">Downloading...</span>
+                    <span className="text-sm font-medium text-gray-900">جارٍ التنزيل...</span>
                     <span className="text-sm font-semibold text-gray-900">
                       {Math.round(progress)}%
                     </span>

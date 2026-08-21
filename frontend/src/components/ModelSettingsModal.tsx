@@ -496,7 +496,7 @@ export function ModelSettingsModal({
     } catch (err) {
       console.error('Error loading OpenRouter models:', err);
       setOpenRouterError(
-        err instanceof Error ? err.message : 'Failed to load OpenRouter models'
+        err instanceof Error ? err.message : 'فشل تحميل نماذج أوبن راوتر'
       );
     } finally {
       setIsLoadingOpenRouter(false);
@@ -519,7 +519,7 @@ export function ModelSettingsModal({
       }
     } catch (err) {
       console.error('Error loading Built-in AI models:', err);
-      toast.error('Failed to load Built-in AI models');
+      toast.error('فشل تحميل نماذج الذكاء الاصطناعي المدمجة');
     }
   };
 
@@ -671,7 +671,7 @@ export function ModelSettingsModal({
   // Test custom OpenAI connection
   const testCustomOpenAIConnection = async () => {
     if (!customOpenAIEndpoint.trim() || !customOpenAIModel.trim()) {
-      toast.error('Please enter endpoint URL and model name first');
+      toast.error('أدخل عنوان نقطة الاتصال واسم النموذج أولًا');
       return;
     }
 
@@ -682,7 +682,7 @@ export function ModelSettingsModal({
         apiKey: customOpenAIApiKey.trim() || null,
         model: customOpenAIModel.trim(),
       });
-      toast.success(result.message || 'Connection successful!');
+      toast.success(result.message || 'تم الاتصال بنجاح!');
     } catch (err) {
       const errorMsg = err instanceof Error ? err.message : String(err);
       toast.error(errorMsg);
@@ -726,7 +726,7 @@ export function ModelSettingsModal({
       // Note: Model is NOT auto-selected - user must explicitly choose it
       // This respects the database as the single source of truth
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to download model';
+      const errorMsg = err instanceof Error ? err.message : 'فشل تنزيل النموذج';
       console.error('Error downloading model:', err);
 
       // Check if Ollama is not installed and show appropriate error
@@ -758,7 +758,7 @@ export function ModelSettingsModal({
       toast.success(`Model ${modelName} deleted`);
       await fetchOllamaModels(true); // Refresh list
     } catch (err) {
-      const errorMsg = err instanceof Error ? err.message : 'Failed to delete model';
+      const errorMsg = err instanceof Error ? err.message : 'فشل حذف النموذج';
       toast.error(errorMsg);
       console.error('Error deleting model:', err);
     }
@@ -804,12 +804,12 @@ export function ModelSettingsModal({
   return (
     <div>
       <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold">Model Settings</h3>
+        <h3 className="text-lg font-semibold">إعدادات النموذج</h3>
       </div>
 
       <div className="space-y-4">
         <div>
-          <Label>Summarization Model</Label>
+          <Label>نموذج التلخيص</Label>
           <div className="flex space-x-2 mt-1">
             <Select
               value={modelConfig.provider}
@@ -874,13 +874,13 @@ export function ModelSettingsModal({
                 <SelectValue placeholder="Select provider" />
               </SelectTrigger>
               <SelectContent className="max-h-64 overflow-y-auto">
-                <SelectItem value="builtin-ai">Built-in AI (Offline, No API needed)</SelectItem>
-                <SelectItem value="claude">Claude</SelectItem>
-                <SelectItem value="custom-openai">Custom Server (OpenAI)</SelectItem>
-                <SelectItem value="groq">Groq</SelectItem>
-                <SelectItem value="ollama">Ollama</SelectItem>
-                <SelectItem value="openai">OpenAI</SelectItem>
-                <SelectItem value="openrouter">OpenRouter</SelectItem>
+                <SelectItem value="builtin-ai">ذكاء اصطناعي مدمج (دون إنترنت أو مفتاح)</SelectItem>
+                <SelectItem value="claude">كلود</SelectItem>
+                <SelectItem value="custom-openai">خادم مخصص متوافق مع أوبن إيه آي</SelectItem>
+                <SelectItem value="groq">غروك</SelectItem>
+                <SelectItem value="ollama">أولاما</SelectItem>
+                <SelectItem value="openai">أوبن إيه آي</SelectItem>
+                <SelectItem value="openrouter">أوبن راوتر</SelectItem>
               </SelectContent>
             </Select>
 
@@ -913,7 +913,7 @@ export function ModelSettingsModal({
                         </div>
                       ) : (
                         <>
-                          <CommandEmpty>No models found.</CommandEmpty>
+                          <CommandEmpty>لم يُعثر على نماذج.</CommandEmpty>
                           <CommandGroup>
                             {modelOptions[modelConfig.provider]?.map((model) => (
                               <CommandItem
@@ -948,7 +948,7 @@ export function ModelSettingsModal({
         {modelConfig.provider === 'custom-openai' && (
           <div className="space-y-4 border-t pt-4">
             <div>
-              <Label htmlFor="custom-endpoint">Endpoint URL *</Label>
+              <Label htmlFor="custom-endpoint">عنوان نقطة الاتصال *</Label>
               <Input
                 id="custom-endpoint"
                 value={customOpenAIEndpoint}
@@ -962,7 +962,7 @@ export function ModelSettingsModal({
             </div>
 
             <div>
-              <Label htmlFor="custom-model">Model Name *</Label>
+              <Label htmlFor="custom-model">اسم النموذج *</Label>
               <Input
                 id="custom-model"
                 value={customOpenAIModel}
@@ -976,7 +976,7 @@ export function ModelSettingsModal({
             </div>
 
             <div>
-              <Label htmlFor="custom-api-key">API Key (optional)</Label>
+              <Label htmlFor="custom-api-key">مفتاح الواجهة البرمجية (اختياري)</Label>
               <Input
                 id="custom-api-key"
                 type="password"
@@ -993,7 +993,7 @@ export function ModelSettingsModal({
                 className="flex items-center justify-between cursor-pointer py-2"
                 onClick={() => setIsCustomOpenAIAdvancedOpen(!isCustomOpenAIAdvancedOpen)}
               >
-                <Label className="cursor-pointer">Advanced Options</Label>
+                <Label className="cursor-pointer">خيارات متقدمة</Label>
                 {isCustomOpenAIAdvancedOpen ? (
                   <ChevronUp className="h-4 w-4 text-muted-foreground" />
                 ) : (
@@ -1004,7 +1004,7 @@ export function ModelSettingsModal({
               {isCustomOpenAIAdvancedOpen && (
                 <div className="space-y-3 pl-2 border-l-2 border-muted mt-2">
                   <div>
-                    <Label htmlFor="custom-max-tokens">Max Tokens</Label>
+                    <Label htmlFor="custom-max-tokens">الحد الأقصى للرموز</Label>
                     <Input
                       id="custom-max-tokens"
                       type="number"
@@ -1015,7 +1015,7 @@ export function ModelSettingsModal({
                     />
                   </div>
                   <div>
-                    <Label htmlFor="custom-temperature">Temperature (0.0-2.0)</Label>
+                    <Label htmlFor="custom-temperature">درجة الإبداع (0.0–2.0)</Label>
                     <Input
                       id="custom-temperature"
                       type="number"
@@ -1029,7 +1029,7 @@ export function ModelSettingsModal({
                     />
                   </div>
                   <div>
-                    <Label htmlFor="custom-top-p">Top P (0.0-1.0)</Label>
+                    <Label htmlFor="custom-top-p">احتمال العيّنة (0.0–1.0)</Label>
                     <Input
                       id="custom-top-p"
                       type="number"
@@ -1072,7 +1072,7 @@ export function ModelSettingsModal({
 
         {requiresApiKey && (
           <div>
-            <Label>API Key</Label>
+            <Label>مفتاح الواجهة البرمجية</Label>
             <div className="relative mt-1">
               <Input
                 type={showApiKey ? 'text' : 'password'}
@@ -1096,7 +1096,7 @@ export function ModelSettingsModal({
                     size="icon"
                     onClick={() => setIsApiKeyLocked(!isApiKeyLocked)}
                     className={isLockButtonVibrating ? 'animate-vibrate text-red-500' : ''}
-                    title={isApiKeyLocked ? 'Unlock to edit' : 'Lock to prevent editing'}
+                    title={isApiKeyLocked ? 'إلغاء القفل للتعديل' : 'القفل لمنع التعديل'}
                   >
                     {isApiKeyLocked ? <Lock /> : <Unlock />}
                   </Button>
@@ -1120,7 +1120,7 @@ export function ModelSettingsModal({
               className="flex items-center justify-between cursor-pointer py-2"
               onClick={() => setIsEndpointSectionCollapsed(!isEndpointSectionCollapsed)}
             >
-              <Label className="cursor-pointer">Custom Endpoint (optional)</Label>
+              <Label className="cursor-pointer">نقطة اتصال مخصصة (اختياري)</Label>
               {isEndpointSectionCollapsed ? (
                 <ChevronDown className="h-4 w-4 text-muted-foreground" />
               ) : (
@@ -1195,10 +1195,10 @@ export function ModelSettingsModal({
         {modelConfig.provider === 'ollama' && (
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h4 className="text-sm font-bold">Available Ollama Models</h4>
+              <h4 className="text-sm font-bold">نماذج أولاما المتاحة</h4>
               {lastFetchedEndpoint && models.length > 0 && (
                 <div className="flex items-center gap-2 text-sm">
-                  <span className="text-muted-foreground">Using:</span>
+                  <span className="text-muted-foreground">المستخدم:</span>
                   <code className="px-2 py-1 bg-muted rounded text-xs">
                     {lastFetchedEndpoint || 'http://localhost:11434'}
                   </code>
@@ -1279,7 +1279,7 @@ export function ModelSettingsModal({
                         {isDownloading('gemma3:1b') && getProgress('gemma3:1b') !== undefined && (
                           <div className="bg-white rounded-md border p-3">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-medium text-blue-600">Downloading gemma3:1b</span>
+                              <span className="text-sm font-medium text-blue-600">جارٍ تنزيل gemma3:1b</span>
                               <span className="text-sm font-semibold text-blue-600">
                                 {Math.round(getProgress('gemma3:1b')!)}%
                               </span>
@@ -1329,7 +1329,7 @@ export function ModelSettingsModal({
                         >
                           <div>
                             <b className="font-bold">{model.name}&nbsp;</b>
-                            <span className="text-muted-foreground">with a size of </span>
+                            <span className="text-muted-foreground">بحجم </span>
                             <span className="font-mono font-bold text-sm">{model.size}</span>
                           </div>
 
@@ -1337,7 +1337,7 @@ export function ModelSettingsModal({
                           {modelIsDownloading && progress !== undefined && (
                             <div className="mt-3 pt-3 border-t border-gray-200">
                               <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm font-medium text-blue-600">Downloading...</span>
+                                <span className="text-sm font-medium text-blue-600">جارٍ التنزيل...</span>
                                 <span className="text-sm font-semibold text-blue-600">{Math.round(progress)}%</span>
                               </div>
                               <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">

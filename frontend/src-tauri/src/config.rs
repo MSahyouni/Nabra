@@ -4,12 +4,12 @@
 /// Used across database initialization, import, and retranscription.
 
 /// Default Whisper model for transcription when no preference is configured.
-/// This is the recommended balance of accuracy and speed.
-pub const DEFAULT_WHISPER_MODEL: &str = "large-v3-turbo";
+/// Keep the first-run download small so onboarding can complete quickly. It must
+/// be in whisper.cpp GGML/GGUF format, e.g. `ggml-tiny-q5_1.bin`.
+pub const DEFAULT_WHISPER_MODEL: &str = "tiny-q5_1";
 
-/// Default Parakeet model for transcription when no preference is configured.
-/// This is the quantized version optimized for speed.
-pub const DEFAULT_PARAKEET_MODEL: &str = "parakeet-tdt-0.6b-v3-int8";
+/// Default transcription provider when no preference is configured.
+pub const DEFAULT_TRANSCRIPTION_PROVIDER: &str = "localWhisper";
 
 /// Whisper model catalog with metadata for all supported models.
 /// Used by both WhisperEngine::discover_models() and discover_models_standalone().

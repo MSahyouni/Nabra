@@ -37,18 +37,17 @@ impl ContinuousVadProcessor {
         let mut config = VadConfig::default();
         config.sample_rate = VAD_SAMPLE_RATE as usize;
 
-        // CONTINUOUS SPEECH FIX: Tuned for capturing complete 5+ second utterances
-        // Previous: 0.55/0.40 with 400ms redemption was fragmenting speech into 40ms segments
-        // New: More lenient thresholds + longer redemption for continuous speech
-        config.positive_speech_threshold = 0.50;  // Silero default - good for continuous speech
-        config.negative_speech_threshold = 0.35;  // Silero default - allows natural pauses
+        // Arabic meeting speech benefits from slightly lenient VAD, mirroring
+        // meet-asr's Whisper VAD threshold around 0.42.
+        config.positive_speech_threshold = 0.42;
+        config.negative_speech_threshold = 0.30;
 
         // CRITICAL FIX: Removed redemption_time capping to support long continuous speech
         // Previous: capped at 400ms, causing VAD to fragment 5-second speech into 40ms segments
         // New: Use full redemption_time from pipeline (2000ms) to bridge natural pauses
         config.redemption_time = Duration::from_millis(redemption_time_ms as u64);
-        config.pre_speech_pad = Duration::from_millis(300);   // Pre-speech padding for context
-        config.post_speech_pad = Duration::from_millis(400);  // Increased: more context at end
+        config.pre_speech_pad = Duration::from_millis(220);
+        config.post_speech_pad = Duration::from_millis(350);
 
         // CRITICAL FIX: Increased min_speech_time to prevent tiny 40ms fragments
         // Previous: 100ms allowed too-short segments that Whisper rejects
@@ -592,4 +591,3 @@ mod tests {
         }
     }
 }
-

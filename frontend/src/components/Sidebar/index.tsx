@@ -72,8 +72,8 @@ const Sidebar: React.FC = () => {
     ollamaEndpoint: null
   });
   const [transcriptModelConfig, setTranscriptModelConfig] = useState<TranscriptModelProps>({
-    provider: 'parakeet',
-    model: 'parakeet-tdt-0.6b-v3-int8',
+    provider: 'localWhisper',
+    model: 'large-v3',
   });
   const [settingsSaveSuccess, setSettingsSaveSuccess] = useState<boolean | null>(null);
 
@@ -337,8 +337,8 @@ const Sidebar: React.FC = () => {
       Analytics.trackMeetingDeleted(itemId);
 
       // Show success toast
-      toast.success("Meeting deleted successfully", {
-        description: "All associated data has been removed"
+      toast.success("تم حذف الاجتماع بنجاح", {
+        description: "أُزيلت جميع البيانات المرتبطة به"
       });
 
       // If deleting the active meeting, navigate to home
@@ -348,7 +348,7 @@ const Sidebar: React.FC = () => {
       }
     } catch (error) {
       console.error('Failed to delete meeting:', error);
-      toast.error("Failed to delete meeting", {
+      toast.error("فشل حذف الاجتماع", {
         description: error instanceof Error ? error.message : String(error)
       });
     }
@@ -379,7 +379,7 @@ const Sidebar: React.FC = () => {
 
     // Prevent empty titles
     if (!newTitle) {
-      toast.error("Meeting title cannot be empty");
+      toast.error("لا يمكن أن يكون عنوان الاجتماع فارغًا");
       return;
     }
 
@@ -403,14 +403,14 @@ const Sidebar: React.FC = () => {
       // Track the edit
       Analytics.trackButtonClick('edit_meeting_title', 'sidebar');
 
-      toast.success("Meeting title updated successfully");
+      toast.success("تم تحديث عنوان الاجتماع بنجاح");
 
       // Close modal and reset state
       setEditModalState({ isOpen: false, meetingId: null, currentTitle: '' });
       setEditingTitle('');
     } catch (error) {
       console.error('Failed to update meeting title:', error);
-      toast.error("Failed to update meeting title", {
+      toast.error("فشل تحديث عنوان الاجتماع", {
         description: error instanceof Error ? error.message : String(error)
       });
     }
@@ -467,7 +467,7 @@ const Sidebar: React.FC = () => {
               </button>
             </TooltipTrigger>
             <TooltipContent side="right">
-              <p>Home</p>
+              <p>الرئيسية</p>
             </TooltipContent>
           </Tooltip>
 
@@ -501,7 +501,7 @@ const Sidebar: React.FC = () => {
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right">
-                <p>Import Audio</p>
+                <p>استيراد صوت</p>
               </TooltipContent>
             </Tooltip>
           )}
@@ -520,7 +520,7 @@ const Sidebar: React.FC = () => {
               </button>
             </TooltipTrigger>
             <TooltipContent side="right">
-              <p>Meeting Notes</p>
+              <p>ملاحظات الاجتماعات</p>
             </TooltipContent>
           </Tooltip>
 
@@ -535,7 +535,7 @@ const Sidebar: React.FC = () => {
               </button>
             </TooltipTrigger>
             <TooltipContent side="right">
-              <p>Settings</p>
+              <p>الإعدادات</p>
             </TooltipContent>
           </Tooltip>
 
@@ -600,7 +600,7 @@ const Sidebar: React.FC = () => {
                 )}
               </div>
               {searchQuery && item.id === 'meetings' && isSearching && (
-                <span className="ml-2 text-xs text-blue-500 animate-pulse">Searching...</span>
+                <span className="ml-2 text-xs text-blue-500 animate-pulse">جارٍ البحث...</span>
               )}
             </>
           ) : (
@@ -624,7 +624,7 @@ const Sidebar: React.FC = () => {
                         handleEditStart(item.id, item.title);
                       }}
                       className="hover:text-blue-600 p-1 rounded-md hover:bg-blue-50 flex-shrink-0"
-                      aria-label="Edit meeting title"
+                      aria-label="تعديل عنوان الاجتماع"
                     >
                       <Pencil className="w-4 h-4" />
                     </button>
@@ -634,7 +634,7 @@ const Sidebar: React.FC = () => {
                         setDeleteModalState({ isOpen: true, itemId: item.id });
                       }}
                       className="hover:text-red-600 p-1 rounded-md hover:bg-red-50 flex-shrink-0"
-                      aria-label="Delete meeting"
+                      aria-label="حذف الاجتماع"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -645,7 +645,7 @@ const Sidebar: React.FC = () => {
               {/* Show transcript match snippet if available */}
               {hasTranscriptMatch && (
                 <div className="mt-1 ml-8 text-xs text-gray-500 bg-yellow-50 p-1.5 rounded border border-yellow-100 line-clamp-2">
-                  <span className="font-medium text-yellow-600">Match:</span> {matchingResult.matchContext}
+                  <span className="font-medium text-yellow-600">مطابقة:</span> {matchingResult.matchContext}
                 </div>
               )}
             </div>
@@ -661,12 +661,12 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="fixed top-0 left-0 h-screen z-40">
+    <div className="fixed top-0 right-0 h-screen z-40">
       {/* Floating collapse button */}
       <button
         onClick={toggleCollapse}
-        className="absolute -right-6 top-20 z-50 p-1 bg-white hover:bg-gray-100 rounded-full shadow-lg border"
-        style={{ transform: 'translateX(50%)' }}
+        className="absolute -left-6 top-20 z-50 p-1 bg-white hover:bg-gray-100 rounded-full shadow-lg border"
+        style={{ transform: 'translateX(-50%)' }}
       >
         {isCollapsed ? (
           <ChevronRightCircle className="w-6 h-6" />
@@ -676,7 +676,7 @@ const Sidebar: React.FC = () => {
       </button>
 
       <div
-        className={`h-screen bg-white border-r shadow-sm flex flex-col transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'
+        className={`h-screen bg-white border-l shadow-sm flex flex-col transition-all duration-300 ${isCollapsed ? 'w-16' : 'w-64'
           }`}
       >
         {/*  Header with traffic light spacing */}
@@ -690,13 +690,13 @@ const Sidebar: React.FC = () => {
             {!isCollapsed && (
               <div className="p-3">
                 {/* <span className="text-lg text-center border rounded-full bg-blue-50 border-white font-semibold text-gray-700 mb-2 block items-center">
-                  <span>Meetily</span>
+                  <span>نَبْرَة</span>
                 </span> */}
                 <Logo isCollapsed={isCollapsed} />
 
                 <div className="relative mb-1">
                   <InputGroup >
-                    <InputGroupInput placeholder='Search meeting content...' value={searchQuery}
+                    <InputGroupInput placeholder='ابحث في محتوى الاجتماعات...' value={searchQuery}
                       onChange={(e) => handleSearchChange(e.target.value)}
                     />
                     <InputGroupAddon>
@@ -728,7 +728,7 @@ const Sidebar: React.FC = () => {
                 className="p-3  text-lg font-semibold items-center hover:bg-gray-100 h-10   flex mx-3 mt-3 rounded-lg cursor-pointer"
               >
                 <Home className="w-4 h-4 mr-2" />
-                <span>Home</span>
+                <span>الرئيسية</span>
               </div>
             )}
           </div>
@@ -747,7 +747,7 @@ const Sidebar: React.FC = () => {
                       <NotebookPen className="w-4 h-4 mr-2 text-gray-600" />
                       <span className="text-gray-700">{item.title}</span>
                       {searchQuery && item.id === 'meetings' && isSearching && (
-                        <span className="ml-2 text-xs text-blue-500 animate-pulse">Searching...</span>
+                        <span className="ml-2 text-xs text-blue-500 animate-pulse">جارٍ البحث...</span>
                       )}
                     </div>
                   </div>
@@ -782,12 +782,12 @@ const Sidebar: React.FC = () => {
               {isRecording ? (
                 <>
                   <Square className="w-4 h-4 mr-2" />
-                  <span>Recording in progress...</span>
+                  <span>التسجيل جارٍ...</span>
                 </>
               ) : (
                 <>
                   <Mic className="w-4 h-4 mr-2" />
-                  <span>Start Recording</span>
+                  <span>بدء التسجيل</span>
                 </>
               )}
             </button>
@@ -798,7 +798,7 @@ const Sidebar: React.FC = () => {
                 className="w-full flex items-center justify-center px-3 py-2 mt-1 text-sm font-medium text-gray-700 bg-blue-100 hover:bg-blue-200 rounded-lg transition-colors shadow-sm"
               >
                 <Upload className="w-4 h-4 mr-2" />
-                <span>Import Audio</span>
+                <span>استيراد صوت</span>
               </button>
             )}
 
@@ -807,7 +807,7 @@ const Sidebar: React.FC = () => {
               className="w-full flex items-center justify-center px-3 py-1.5 mt-1 mb-1 text-sm font-medium text-gray-700 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors shadow-sm"
             >
               <Settings className="w-4 h-4 mr-2" />
-              <span>Settings</span>
+              <span>الإعدادات</span>
             </button>
             <Info isCollapsed={isCollapsed} />
             <div className="w-full flex items-center justify-center px-3 py-1 text-xs text-gray-400">
@@ -820,7 +820,7 @@ const Sidebar: React.FC = () => {
       {/* Confirmation Modal for Delete */}
       <ConfirmationModal
         isOpen={deleteModalState.isOpen}
-        text="Are you sure you want to delete this meeting? This action cannot be undone."
+        text="هل تريد بالتأكيد حذف هذا الاجتماع؟ لا يمكن التراجع عن هذا الإجراء."
         onConfirm={handleDeleteConfirm}
         onCancel={() => setDeleteModalState({ isOpen: false, itemId: null })}
       />
@@ -831,14 +831,14 @@ const Sidebar: React.FC = () => {
       }}>
         <DialogContent className="sm:max-w-[425px]">
           <VisuallyHidden>
-            <DialogTitle>Edit Meeting Title</DialogTitle>
+            <DialogTitle>تعديل عنوان الاجتماع</DialogTitle>
           </VisuallyHidden>
           <div className="py-4">
-            <h3 className="text-lg font-semibold mb-4">Edit Meeting Title</h3>
+            <h3 className="text-lg font-semibold mb-4">تعديل عنوان الاجتماع</h3>
             <div className="space-y-4">
               <div>
                 <label htmlFor="meeting-title" className="block text-sm font-medium text-gray-700 mb-2">
-                  Meeting Title
+                  عنوان الاجتماع
                 </label>
                 <input
                   id="meeting-title"
@@ -853,7 +853,7 @@ const Sidebar: React.FC = () => {
                     }
                   }}
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  placeholder="Enter meeting title"
+                  placeholder="أدخل عنوان الاجتماع"
                   autoFocus
                 />
               </div>
@@ -864,13 +864,13 @@ const Sidebar: React.FC = () => {
               onClick={handleEditCancel}
               className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
             >
-              Cancel
+              إلغاء
             </button>
             <button
               onClick={handleEditConfirm}
               className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
             >
-              Save
+              حفظ
             </button>
           </DialogFooter>
         </DialogContent>

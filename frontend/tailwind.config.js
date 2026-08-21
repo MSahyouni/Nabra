@@ -8,12 +8,35 @@ module.exports = {
   ],
   theme: {
   	extend: {
-  		fontFamily: {
-  			sans: [
-  				'var(--font-source-sans-3)'
-  			]
-  		},
-  		colors: {
+		fontFamily: {
+			sans: [
+				'Qomra',
+				'system-ui',
+				'sans-serif'
+			]
+		},
+		colors: {
+			syrian: {
+				forest: {
+					500: '#428177',
+					800: '#054239',
+					950: '#002623'
+				},
+				wheat: {
+					100: '#edebe0',
+					500: '#b9a779',
+					700: '#988561'
+				},
+				umber: {
+					700: '#6b1f2a',
+					800: '#4a151e',
+					950: '#260f14'
+				},
+				charcoal: {
+					700: '#3d3a3b',
+					950: '#161616'
+				}
+			},
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			border: 'hsl(var(--border))',

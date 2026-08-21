@@ -48,10 +48,10 @@ export function TranscriptButtonGroup({
             onCopyTranscript();
           }}
           disabled={transcriptCount === 0}
-          title={transcriptCount === 0 ? 'No transcript available' : 'Copy Transcript'}
+          title={transcriptCount === 0 ? 'لا يتوفر تفريغ' : 'نسخ التفريغ'}
         >
           <Copy />
-          <span className="hidden lg:inline">Copy</span>
+          <span className="hidden lg:inline">نسخ</span>
         </Button>
 
         <Button
@@ -65,7 +65,7 @@ export function TranscriptButtonGroup({
           title="Open Recording Folder"
         >
           <FolderOpen className="xl:mr-2" size={18} />
-          <span className="hidden lg:inline">Recording</span>
+          <span className="hidden lg:inline">التسجيل</span>
         </Button>
 
         {betaFeatures.importAndRetranscribe && meetingId && meetingFolderPath && (
@@ -80,7 +80,7 @@ export function TranscriptButtonGroup({
             title="Retranscribe to enhance your recorded audio"
           >
             <RefreshCw className="xl:mr-2" size={18} />
-            <span className="hidden lg:inline">Enhance</span>
+            <span className="hidden lg:inline">تحسين</span>
           </Button>
         )}
       </ButtonGroup>

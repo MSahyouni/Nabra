@@ -10,22 +10,22 @@ export function WelcomeStep() {
   const features = [
     {
       icon: Lock,
-      title: 'Your data never leaves your device',
+      title: 'بياناتك تبقى على جهازك',
     },
     {
       icon: Sparkles,
-      title: 'Intelligent summaries & insights',
+      title: 'تلخيص عربي واستخراج أفكار مهمة',
     },
     {
       icon: Cpu,
-      title: 'Works offline, no cloud required',
+      title: 'يعمل محليًا بدون اعتماد أساسي على السحابة',
     },
   ];
 
   return (
     <OnboardingContainer
-      title="Welcome to Meetily"
-      description="Record. Transcribe. Summarize. All on your device."
+      title="أهلًا بك في نَبْرَة"
+      description="سجّل، فرّغ، ولخّص اجتماعاتك عربيًا على جهازك."
       step={1}
       hideProgress={true}
     >
@@ -56,9 +56,9 @@ export function WelcomeStep() {
             onClick={goNext}
             className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white"
           >
-            Get Started
+            ابدأ
           </Button>
-          <p className="text-xs text-center text-gray-500">Takes less than 3 minutes</p>
+          <p className="text-xs text-center text-gray-500">يستغرق الإعداد أقل من 3 دقائق</p>
         </div>
       </div>
     </OnboardingContainer>

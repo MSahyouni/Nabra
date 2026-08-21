@@ -132,10 +132,10 @@ export function useMeetingData({ meeting, summaryData, onMeetingUpdated }: UseMe
         await handleSaveSummary(aiSummary);
       }
 
-      toast.success("Changes saved successfully");
+      toast.success("تم حفظ التغييرات بنجاح");
     } catch (error) {
       console.error('Failed to save changes:', error);
-      toast.error("Failed to save changes", { description: String(error) });
+      toast.error("فشل حفظ التغييرات", { description: String(error) });
     } finally {
       setIsSaving(false);
     }

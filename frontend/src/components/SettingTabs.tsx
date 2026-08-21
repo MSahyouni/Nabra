@@ -33,10 +33,10 @@ export function SettingTabs({
     return (
         <Tabs defaultValue={defaultTab} className="w-full max-h-[calc(100vh-10rem)] overflow-y-auto" onValueChange={handleTabChange}>
   <TabsList>
-    <TabsTrigger value="transcriptSettings">Transcript</TabsTrigger>
-    <TabsTrigger value="modelSettings">Ai Summary</TabsTrigger>
-    <TabsTrigger value="recordingSettings">Preferences</TabsTrigger>
-    <TabsTrigger value="about">About</TabsTrigger>
+    <TabsTrigger value="transcriptSettings">التفريغ</TabsTrigger>
+    <TabsTrigger value="modelSettings">التلخيص الذكي</TabsTrigger>
+    <TabsTrigger value="recordingSettings">التفضيلات</TabsTrigger>
+    <TabsTrigger value="about">حول التطبيق</TabsTrigger>
   </TabsList>
   <TabsContent value="modelSettings">
     <ModelSettingsModal
@@ -62,5 +62,4 @@ onSave={onSave}
 </Tabs>
     )
 }
-
 

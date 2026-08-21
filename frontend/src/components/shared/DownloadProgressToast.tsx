@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { listen } from '@tauri-apps/api/event';
 import { toast } from 'sonner';
-import { X, Download, Check, Loader2, ArrowBigDownDash } from 'lucide-react';
+import { X, Check, ArrowBigDownDash } from 'lucide-react';
 import { getDownloadTotalMb } from '@/lib/onboarding-summary-model';
 
 interface DownloadProgress {
@@ -26,21 +26,21 @@ function categorizeError(error: string): string {
     lowerError.includes('connection') ||
     lowerError.includes('timeout') ||
     lowerError.includes('failed to start download')) {
-    return 'Network error - Check your internet connection';
+    return 'خطأ في الشبكة — تحقق من اتصالك بالإنترنت';
   }
 
   if (lowerError.includes('status:') || lowerError.includes('http')) {
-    return 'Server error - Download temporarily unavailable';
+    return 'خطأ في الخادم — التنزيل غير متاح مؤقتًا';
   }
 
   if (lowerError.includes('disk') ||
     lowerError.includes('write') ||
     lowerError.includes('file')) {
-    return 'Storage error - Check available disk space';
+    return 'خطأ في التخزين — تحقق من المساحة المتاحة';
   }
 
   if (lowerError.includes('invalid') || lowerError.includes('validation')) {
-    return 'File validation failed - Please retry download';
+    return 'فشل التحقق من الملف — أعد التنزيل';
   }
 
   // Fallback to original error
@@ -86,11 +86,11 @@ function DownloadToastContent({
         </div>
 
         {hasError ? (
-          <p className="text-xs text-red-600">{download.error || 'Download failed'}</p>
+          <p className="text-xs text-red-600">{download.error || 'فشل التنزيل'}</p>
         ) : isComplete ? (
-          <p className="text-xs text-green-600">Download complete</p>
+          <p className="text-xs text-green-600">اكتمل التنزيل</p>
         ) : isCancelled ? (
-          <p className="text-xs text-gray-600">Download cancelled</p>
+          <p className="text-xs text-gray-600">أُلغي التنزيل</p>
         ) : (
           <>
             {/* Progress bar */}
@@ -219,87 +219,6 @@ export function useDownloadProgressToast() {
     });
   }, [downloads, dismissedModels, showDownloadToast]);
 
-  // Listen to Parakeet download events
-  useEffect(() => {
-    const unlistenProgress = listen<{
-      modelName: string;
-      progress: number;
-      downloaded_mb?: number;
-      total_mb?: number;
-      speed_mbps?: number;
-      status?: string;
-    }>('parakeet-model-download-progress', (event) => {
-      const { modelName, progress, downloaded_mb, total_mb, speed_mbps, status } = event.payload;
-
-      const downloadData: DownloadProgress = {
-        modelName,
-        displayName: 'Transcription Model (Parakeet)',
-        progress,
-        downloadedMb: downloaded_mb ?? 0,
-        totalMb: total_mb ?? 670,
-        speedMbps: speed_mbps ?? 0,
-        status: status === 'cancelled'
-          ? 'cancelled'
-          : status === 'completed' || progress >= 100
-          ? 'completed'
-          : 'downloading',
-      };
-
-      updateDownload(modelName, downloadData);
-
-      // Clean up cancelled downloads after delay to auto-dismiss toast
-      if (downloadData.status === 'cancelled') {
-        cleanupDownload(modelName, 6000); // 5s toast + 1s buffer
-      }
-      // Removed direct showDownloadToast call here, handled by effect
-    });
-
-    const unlistenComplete = listen<{ modelName: string }>(
-      'parakeet-model-download-complete',
-      (event) => {
-        const { modelName } = event.payload;
-        const downloadData: DownloadProgress = {
-          modelName,
-          displayName: 'Transcription Model (Parakeet)',
-          progress: 100,
-          downloadedMb: 670,
-          totalMb: 670,
-          speedMbps: 0,
-          status: 'completed',
-        };
-        updateDownload(modelName, downloadData);
-        // Clean up after 4 seconds (completion toast duration is 3s + 1s buffer)
-        cleanupDownload(modelName, 4000);
-      }
-    );
-
-    const unlistenError = listen<{ modelName: string; error: string }>(
-      'parakeet-model-download-error',
-      (event) => {
-        const { modelName, error } = event.payload;
-        const downloadData: DownloadProgress = {
-          modelName,
-          displayName: 'Transcription Model (Parakeet)',
-          progress: 0,
-          downloadedMb: 0,
-          totalMb: 670,
-          speedMbps: 0,
-          status: 'error',
-          error: categorizeError(error),
-        };
-        updateDownload(modelName, downloadData);
-        // Clean up after 11 seconds (error toast duration is 10s + 1s buffer)
-        cleanupDownload(modelName, 11000);
-      }
-    );
-
-    return () => {
-      unlistenProgress.then((fn) => fn());
-      unlistenComplete.then((fn) => fn());
-      unlistenError.then((fn) => fn());
-    };
-  }, [updateDownload, cleanupDownload]);
-
   // Listen to Built-in AI summary model download events
   useEffect(() => {
     const unlisten = listen<{
@@ -328,7 +247,7 @@ export function useDownloadProgressToast() {
             : status === 'error'
               ? 'error'
               : 'downloading',
-        error: status === 'error' ? categorizeError(error || 'Download failed') : undefined,
+        error: status === 'error' ? categorizeError(error || 'فشل التنزيل') : undefined,
       };
 
       updateDownload(model, downloadData);

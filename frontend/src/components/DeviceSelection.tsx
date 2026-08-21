@@ -59,7 +59,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
       console.log('Fetched audio devices:', result);
     } catch (err) {
       console.error('Failed to fetch audio devices:', err);
-      setError('Failed to load audio devices. Please check your system audio settings.');
+      setError('فشل تحميل أجهزة الصوت. تحقق من إعدادات صوت النظام.');
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -176,7 +176,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
       // Only monitor input devices for now (microphones)
       const deviceNames = inputDevices.map(device => device.name);
       if (deviceNames.length === 0) {
-        setError('No microphone devices found to monitor');
+        setError('لم يُعثر على ميكروفون لمراقبته');
         return;
       }
 
@@ -186,7 +186,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
       console.log('Started audio level monitoring for input devices:', deviceNames);
     } catch (err) {
       console.error('Failed to start audio level monitoring:', err);
-      setError('Failed to start audio level monitoring');
+      setError('تعذّر بدء مراقبة مستوى الصوت');
     }
   };
 
@@ -226,7 +226,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h4 className="text-sm font-medium text-gray-900">Audio Devices</h4>
+        <h4 className="text-sm font-medium text-gray-900">أجهزة الصوت</h4>
         <div className="flex items-center space-x-2">
           {/* TODO: Monitoring */}
           {/* <button */}
@@ -275,7 +275,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
               <SelectValue placeholder="Select Microphone" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="default">Default Microphone</SelectItem>
+              <SelectItem value="default">الميكروفون الافتراضي</SelectItem>
               {inputDevices.map((device) => (
                 <SelectItem
                   key={device.name}
@@ -287,13 +287,13 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
             </SelectContent>
           </Select>
           {inputDevices.length === 0 && (
-            <p className="text-xs text-gray-500">No microphone devices found</p>
+            <p className="text-xs text-gray-500">لم يُعثر على ميكروفون</p>
           )}
 
           {/* Audio Level Meters for Input Devices */}
           {showLevels && inputDevices.length > 0 && (
             <div className="space-y-2 pt-2 border-t border-gray-100">
-              <p className="text-xs text-gray-600 font-medium">Microphone Levels:</p>
+              <p className="text-xs text-gray-600 font-medium">مستويات الميكروفون:</p>
               {inputDevices.map((device) => {
                 const levelData = audioLevels.get(device.name);
                 return (
@@ -344,7 +344,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
               <SelectValue placeholder="Select System Audio" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="default">Default System Audio</SelectItem>
+              <SelectItem value="default">صوت النظام الافتراضي</SelectItem>
               {outputDevices.map((device) => (
                 <SelectItem
                   key={device.name}
@@ -357,7 +357,7 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
           </Select>
 
           {outputDevices.length === 0 && (
-            <p className="text-xs text-gray-500">No system audio devices found</p>
+            <p className="text-xs text-gray-500">لم يُعثر على جهاز لصوت النظام</p>
           )}
 
           {/* Backend Selection - available on all platforms */}
@@ -371,13 +371,13 @@ export function DeviceSelection({ selectedDevices, onDeviceChange, disabled = fa
 
       {/* Info text */}
       <div className="text-xs text-gray-500 space-y-1">
-        <p>• <strong>Microphone:</strong> Records your voice and ambient sound</p>
-        <p>• <strong>System Audio:</strong> Records computer audio (music, calls, etc.)</p>
+        <p>• <strong>الميكروفون:</strong> يسجّل صوتك والأصوات المحيطة</p>
+        <p>• <strong>صوت النظام:</strong> يسجّل صوت الحاسوب، مثل الموسيقى والمكالمات</p>
         {isMonitoring && (
-          <p>• <strong>Mic Levels:</strong> Green = good, Yellow = loud, Red = too loud</p>
+          <p>• <strong>مستويات الميكروفون:</strong> الأخضر جيد، والأصفر مرتفع، والأحمر مرتفع جدًا</p>
         )}
         {!isMonitoring && inputDevices.length > 0 && (
-          <p>• <strong>Tip:</strong> Click "Test Mic" to check if your microphone is working</p>
+          <p>• <strong>نصيحة:</strong> اضغط «اختبار الميكروفون» للتحقق من عمله</p>
         )}
       </div>
     </div>

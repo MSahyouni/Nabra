@@ -38,11 +38,11 @@ export function UpdateDialog({ open, onOpenChange, updateInfo }: UpdateDialogPro
         if (updateResult?.available) {
           setUpdate(updateResult);
         } else {
-          setError('Update no longer available');
+          setError('لم يعد التحديث متاحًا');
         }
       }).catch((err) => {
         console.error('Failed to get update object:', err);
-        setError('Failed to prepare update: ' + (err.message || 'Unknown error'));
+        setError('فشل تجهيز التحديث: ' + (err.message || 'خطأ غير معروف'));
       });
     } else {
       // Reset state when dialog closes
@@ -63,11 +63,11 @@ export function UpdateDialog({ open, onOpenChange, updateInfo }: UpdateDialogPro
           updateToUse = updateResult;
           setUpdate(updateResult);
         } else {
-          setError('Update not available');
+          setError('التحديث غير متاح');
           return;
         }
       } catch (err: any) {
-        setError('Failed to get update: ' + (err.message || 'Unknown error'));
+        setError('فشل جلب التحديث: ' + (err.message || 'خطأ غير معروف'));
         return;
       }
     }
@@ -123,7 +123,7 @@ export function UpdateDialog({ open, onOpenChange, updateInfo }: UpdateDialogPro
       });
 
       console.log('[UpdateDialog] Update installed successfully');
-      toast.success('Update installed successfully. The app will restart...');
+      toast.success('تم تثبيت التحديث بنجاح. سيُعاد تشغيل التطبيق...');
 
       // Mark download as complete before closing
       setIsDownloading(false);
@@ -135,9 +135,9 @@ export function UpdateDialog({ open, onOpenChange, updateInfo }: UpdateDialogPro
       await relaunch();
     } catch (err: any) {
       console.error('Update failed:', err);
-      setError(err.message || 'Failed to download or install update');
+      setError(err.message || 'فشل تنزيل التحديث أو تثبيته');
       setIsDownloading(false);
-      toast.error('Update failed: ' + (err.message || 'Unknown error'));
+      toast.error('فشل التحديث: ' + (err.message || 'خطأ غير معروف'));
     }
   };
 
@@ -206,9 +206,9 @@ export function UpdateDialog({ open, onOpenChange, updateInfo }: UpdateDialogPro
           </DialogTitle>
           <DialogDescription>
             {isDownloading
-              ? 'Downloading the latest version...'
+              ? 'جارٍ تنزيل أحدث إصدار...'
               : error
-              ? 'An error occurred while updating'
+              ? 'حدث خطأ أثناء التحديث'
               : `A new version (${updateInfo.version}) is available`}
           </DialogDescription>
         </DialogHeader>
@@ -218,16 +218,16 @@ export function UpdateDialog({ open, onOpenChange, updateInfo }: UpdateDialogPro
             <>
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Current Version:</span>
+                  <span className="text-muted-foreground">الإصدار الحالي:</span>
                   <span className="font-medium">{updateInfo.currentVersion}</span>
                 </div>
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">New Version:</span>
+                  <span className="text-muted-foreground">الإصدار الجديد:</span>
                   <span className="font-medium text-blue-600">{updateInfo.version}</span>
                 </div>
                 {updateInfo.date && (
                   <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Release Date:</span>
+                    <span className="text-muted-foreground">تاريخ الإصدار:</span>
                     <span className="font-medium">{formatDate(updateInfo.date)}</span>
                   </div>
                 )}

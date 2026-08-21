@@ -96,6 +96,46 @@ pub fn normalize_v2(audio: &[f32]) -> Vec<f32> {
         .collect()
 }
 
+/// Lightweight speech enhancement for ASR at 16kHz mono.
+///
+/// This intentionally avoids heavy denoising. It removes low-frequency rumble,
+/// gently lifts quiet speech, and applies a soft limiter to prevent clipping.
+pub fn enhance_for_asr_light(audio: &[f32], sample_rate: u32) -> Vec<f32> {
+    if audio.is_empty() {
+        return Vec::new();
+    }
+
+    let mut high_pass = HighPassFilter::new(sample_rate, 60.0);
+    let filtered = high_pass.process(audio);
+
+    let rms = (filtered.iter().map(|&x| x * x).sum::<f32>() / filtered.len() as f32).sqrt();
+    let peak = filtered
+        .iter()
+        .fold(0.0f32, |max, &sample| max.max(sample.abs()));
+
+    if rms < 0.000_001 || peak < 0.000_001 {
+        return filtered;
+    }
+
+    let target_rms = 0.08;
+    let target_peak = 0.92;
+    let gain = (target_rms / rms).min(target_peak / peak).clamp(1.0, 6.0);
+
+    filtered
+        .iter()
+        .map(|&sample| {
+            let scaled = sample * gain;
+            if scaled > target_peak {
+                target_peak + (scaled - target_peak) * 0.08
+            } else if scaled < -target_peak {
+                -target_peak + (scaled + target_peak) * 0.08
+            } else {
+                scaled
+            }
+        })
+        .collect()
+}
+
 /// True peak limiter with lookahead buffer (prevents clipping)
 struct TruePeakLimiter {
     lookahead_samples: usize,
@@ -365,7 +405,7 @@ impl HighPassFilter {
         let dt = 1.0 / sample_rate_f;
         let alpha = rc / (rc + dt);
 
-        info!("Initializing high-pass filter: cutoff={}Hz @ {}Hz", cutoff_hz, sample_rate);
+        debug!("Initializing high-pass filter: cutoff={}Hz @ {}Hz", cutoff_hz, sample_rate);
 
         Self {
             sample_rate: sample_rate_f,

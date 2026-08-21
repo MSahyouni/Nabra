@@ -169,14 +169,6 @@ export function ImportAudioDialog({
     const name = selectedModelKey.slice(colonIndex + 1);
     return availableModels.find((m) => m.provider === provider && m.name === name);
   }, [selectedModelKey, availableModels]);
-  const isParakeetModel = selectedModel?.provider === 'parakeet';
-
-  useEffect(() => {
-    if (isParakeetModel && selectedLang !== 'auto') {
-      setSelectedLang('auto');
-    }
-  }, [isParakeetModel, selectedLang]);
-
   const handleSelectFile = async () => {
     const info = await selectFile();
     if (info) {
@@ -190,7 +182,7 @@ export function ImportAudioDialog({
     await startImport(
       fileInfo.path,
       title || fileInfo.filename,
-      isParakeetModel ? null : selectedLang === 'auto' ? null : selectedLang,
+      selectedLang === 'auto' ? null : selectedLang,
       selectedModel?.name || null,
       selectedModel?.provider || null
     );
@@ -257,9 +249,9 @@ export function ImportAudioDialog({
           </DialogTitle>
           <DialogDescription>
             {isProcessing
-              ? progress?.message || 'Processing audio...'
+              ? progress?.message || 'جارٍ معالجة الصوت...'
               : error
-              ? 'An error occurred during import'
+              ? 'حدث خطأ أثناء الاستيراد'
               : 'Import an audio file to create a new meeting with transcripts'}
           </DialogDescription>
         </DialogHeader>
@@ -290,7 +282,7 @@ export function ImportAudioDialog({
 
                   {/* Editable title */}
                   <div className="space-y-1">
-                    <label className="text-sm font-medium text-gray-700">Meeting Title</label>
+                    <label className="text-sm font-medium text-gray-700">عنوان الاجتماع</label>
                     <Input
                       value={title}
                       onChange={(e) => {
@@ -332,7 +324,7 @@ export function ImportAudioDialog({
                     onClick={() => setShowAdvanced(!showAdvanced)}
                     className="w-full flex items-center justify-between p-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
                   >
-                    <span>Advanced Options</span>
+                    <span>خيارات متقدمة</span>
                     {showAdvanced ? (
                       <ChevronUp className="h-4 w-4" />
                     ) : (
@@ -343,43 +335,31 @@ export function ImportAudioDialog({
                   {showAdvanced && (
                     <div className="p-3 pt-0 space-y-4 border-t">
                       {/* Language selector */}
-                      {!isParakeetModel ? (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Globe className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Language</span>
-                          </div>
-                          <Select value={selectedLang} onValueChange={setSelectedLang}>
-                            <SelectTrigger className="w-full">
-                              <SelectValue placeholder="Select language" />
-                            </SelectTrigger>
-                            <SelectContent className="max-h-60">
-                              {LANGUAGES.map((lang) => (
-                                <SelectItem key={lang.code} value={lang.code}>
-                                  {lang.name}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <Globe className="h-4 w-4 text-muted-foreground" />
+                          <span className="text-sm font-medium">اللغة</span>
                         </div>
-                      ) : (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2">
-                            <Globe className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Language</span>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            Language selection isn't supported for Parakeet. It always uses automatic detection.
-                          </p>
-                        </div>
-                      )}
+                        <Select value={selectedLang} onValueChange={setSelectedLang}>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="اختر اللغة" />
+                          </SelectTrigger>
+                          <SelectContent className="max-h-60">
+                            {LANGUAGES.map((lang) => (
+                              <SelectItem key={lang.code} value={lang.code}>
+                                {lang.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
 
                       {/* Model selector */}
                       {availableModels.length > 0 && (
                         <div className="space-y-2">
                           <div className="flex items-center gap-2">
                             <Cpu className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm font-medium">Model</span>
+                            <span className="text-sm font-medium">النموذج</span>
                           </div>
                           <Select
                             value={selectedModelKey}
@@ -387,7 +367,7 @@ export function ImportAudioDialog({
                             disabled={loadingModels}
                           >
                             <SelectTrigger className="w-full">
-                              <SelectValue placeholder={loadingModels ? 'Loading models...' : 'Select model'} />
+                              <SelectValue placeholder={loadingModels ? 'جارٍ تحميل النماذج...' : 'اختر النموذج'} />
                             </SelectTrigger>
                             <SelectContent>
                               {availableModels.map((model) => (

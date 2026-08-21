@@ -19,7 +19,7 @@ export default function AnalyticsDataModal({ isOpen, onClose, onConfirmDisable }
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <div className="flex items-center gap-3">
             <Shield className="w-6 h-6 text-blue-600" />
-            <h2 className="text-xl font-semibold text-gray-900">What Analytics Collects</h2>
+            <h2 className="text-xl font-semibold text-gray-900">ما الذي تجمعه التحليلات؟</h2>
           </div>
           <button
             onClick={onClose}
@@ -36,25 +36,25 @@ export default function AnalyticsDataModal({ isOpen, onClose, onConfirmDisable }
             <div className="flex items-start gap-3">
               <Info className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
               <div className="text-sm text-green-800">
-                <p className="font-semibold mb-1">Your Privacy is Protected</p>
-                <p>Analytics is off by default. If you enable it, we collect <strong>anonymous usage data only</strong>. No meeting content, names, file paths, or personal information is ever collected.</p>
+                <p className="font-semibold mb-1">خصوصيتك محمية</p>
+                <p>التحليلات متوقفة افتراضيًا. عند تفعيلها لا تُجمع إلا <strong>بيانات استخدام مجهولة</strong>، ولا يُجمع محتوى الاجتماعات أو الأسماء أو مسارات الملفات أو أي معلومات شخصية.</p>
               </div>
             </div>
           </div>
 
           {/* Data Categories */}
           <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-gray-900">Data We Collect When Enabled:</h3>
+            <h3 className="text-lg font-semibold text-gray-900">البيانات التي تُجمع عند التفعيل:</h3>
 
             {/* Model Preferences */}
             <div className="border border-gray-200 rounded-lg p-4">
               <h4 className="font-semibold text-gray-900 mb-2">1. Model Preferences</h4>
               <ul className="text-sm text-gray-700 space-y-1 ml-4">
-                <li>• Transcription model (e.g., "Whisper large-v3", "Parakeet")</li>
+                <li>• Transcription model (e.g., "Whisper large-v3")</li>
                 <li>• Summary model (e.g., "Llama 3.2", "Claude Sonnet")</li>
                 <li>• Model provider (e.g., "Local", "Ollama", "OpenRouter")</li>
               </ul>
-              <p className="text-xs text-gray-500 mt-2 italic">Helps us understand which models users prefer</p>
+              <p className="text-xs text-gray-500 mt-2 italic">تساعدنا على معرفة النماذج التي يفضّلها المستخدمون</p>
             </div>
 
             {/* Meeting Metrics */}
@@ -66,7 +66,7 @@ export default function AnalyticsDataModal({ isOpen, onClose, onConfirmDisable }
                 <li>• Number of transcript segments</li>
                 <li>• Number of audio chunks processed</li>
               </ul>
-              <p className="text-xs text-gray-500 mt-2 italic">Helps us optimize performance and understand usage patterns</p>
+              <p className="text-xs text-gray-500 mt-2 italic">تساعدنا على تحسين الأداء وفهم أنماط الاستخدام</p>
             </div>
 
             {/* Device Types */}
@@ -76,7 +76,7 @@ export default function AnalyticsDataModal({ isOpen, onClose, onConfirmDisable }
                 <li>• Microphone type: "Bluetooth" or "Wired" or "Unknown"</li>
                 <li>• System audio type: "Bluetooth" or "Wired" or "Unknown"</li>
               </ul>
-              <p className="text-xs text-gray-500 mt-2 italic">Helps us improve compatibility, NOT the actual device names</p>
+              <p className="text-xs text-gray-500 mt-2 italic">تساعدنا على تحسين التوافق، من دون جمع أسماء الأجهزة الفعلية</p>
             </div>
 
             {/* Usage Patterns */}
@@ -88,7 +88,7 @@ export default function AnalyticsDataModal({ isOpen, onClose, onConfirmDisable }
                 <li>• Feature usage (e.g., "settings changed")</li>
                 <li>• Error occurrences (helps us fix bugs)</li>
               </ul>
-              <p className="text-xs text-gray-500 mt-2 italic">Helps us improve user experience</p>
+              <p className="text-xs text-gray-500 mt-2 italic">تساعدنا على تحسين تجربة الاستخدام</p>
             </div>
 
             {/* Platform Info */}
@@ -99,13 +99,13 @@ export default function AnalyticsDataModal({ isOpen, onClose, onConfirmDisable }
                 <li>• App version (automatically included in all events)</li>
                 <li>• Architecture (e.g., "x86_64", "aarch64")</li>
               </ul>
-              <p className="text-xs text-gray-500 mt-2 italic">Helps us prioritize platform support</p>
+              <p className="text-xs text-gray-500 mt-2 italic">تساعدنا على ترتيب أولويات دعم الأنظمة</p>
             </div>
           </div>
 
           {/* What We DON'T Collect */}
           <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-            <h4 className="font-semibold text-red-900 mb-2">What We DON'T Collect:</h4>
+            <h4 className="font-semibold text-red-900 mb-2">ما لا نجمعه:</h4>
             <ul className="text-sm text-red-800 space-y-1 ml-4">
               <li>• ❌ Meeting names or titles</li>
               <li>• ❌ File names, file paths, or meeting folders</li>
@@ -119,13 +119,13 @@ export default function AnalyticsDataModal({ isOpen, onClose, onConfirmDisable }
 
           {/* Example Event */}
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <h4 className="font-semibold text-gray-900 mb-2">Example Event:</h4>
+            <h4 className="font-semibold text-gray-900 mb-2">مثال على حدث:</h4>
             <pre className="text-xs text-gray-700 overflow-x-auto">
               {`{
   "event": "meeting_ended",
   "app_version": "0.4.0",
-  "transcription_provider": "parakeet",
-  "transcription_model": "parakeet-tdt-0.6b-v3-int8",
+  "transcription_provider": "localWhisper",
+  "transcription_model": "large-v3",
   "summary_provider": "ollama",
   "summary_model": "llama3.2:latest",
   "total_duration_seconds": "125.5",

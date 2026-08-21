@@ -404,7 +404,7 @@ export function ModelManager({
   if (error) {
     return (
       <div className={`bg-red-50 border border-red-200 rounded-lg p-4 ${className}`}>
-        <p className="text-sm text-red-800">Failed to load models</p>
+        <p className="text-sm text-red-800">فشل تحميل النماذج</p>
         <p className="text-xs text-red-600 mt-1">{error}</p>
       </div>
     );
@@ -447,7 +447,7 @@ export function ModelManager({
         <Accordion type="single" collapsible className="w-full">
           <AccordionItem value="advanced-models">
             <AccordionTrigger>
-              <span className='text-lg'>Advanced Models</span>
+              <span className='text-lg'>النماذج المتقدمة</span>
             </AccordionTrigger>
             <AccordionContent>
               <div className="space-y-3 pt-4">
@@ -605,7 +605,7 @@ function ModelCard({
               <>
                 <div className="flex items-center gap-1.5 text-green-600">
                   <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <span className="text-xs font-medium">Ready</span>
+                  <span className="text-xs font-medium">جاهز</span>
                 </div>
                 <AnimatePresence>
                   {isHovered && (
@@ -689,7 +689,7 @@ function ModelCard({
           >
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-blue-600">Downloading...</span>
+                <span className="text-sm font-medium text-blue-600">جارٍ التنزيل...</span>
                 <span className="text-sm font-semibold text-blue-600">{Math.round(downloadProgress)}%</span>
               </div>
               <button

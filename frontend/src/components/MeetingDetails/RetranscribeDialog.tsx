@@ -92,14 +92,6 @@ export function RetranscribeDialog({
     const name = selectedModelKey.slice(colonIndex + 1);
     return availableModels.find(m => m.provider === provider && m.name === name);
   }, [selectedModelKey, availableModels]);
-  const isParakeetModel = selectedModelDetails?.provider === 'parakeet';
-
-  useEffect(() => {
-    if (isParakeetModel && selectedLang !== 'auto') {
-      setSelectedLang('auto');
-    }
-  }, [isParakeetModel, selectedLang]);
-
   // Reset state only when dialog transitions from closed to open
   // This prevents re-initialization when config changes while dialog is already open
   useEffect(() => {
@@ -198,7 +190,7 @@ export function RetranscribeDialog({
 
   const handleStartRetranscription = async () => {
     if (!meetingFolderPath) {
-      setError('Meeting folder path not available');
+      setError('مسار مجلد الاجتماع غير متاح');
       return;
     }
 
@@ -207,9 +199,9 @@ export function RetranscribeDialog({
     setProgress(null);
 
     try {
-      const languageToSend = isParakeetModel ? null : selectedLang === 'auto' ? null : selectedLang;
+      const languageToSend = selectedLang === 'auto' ? null : selectedLang;
       await Analytics.track('enhance_transcript_started', {
-        language: isParakeetModel ? 'auto' : (selectedLang === 'auto' ? 'auto' : selectedLang),
+        language: selectedLang === 'auto' ? 'auto' : selectedLang,
         model_provider: selectedModelDetails?.provider || '',
         model_name: selectedModelDetails?.name || ''
       });
@@ -236,7 +228,7 @@ export function RetranscribeDialog({
         await invoke('cancel_retranscription_command');
         setIsProcessing(false);
         setProgress(null);
-        toast.info('Retranscription cancelled');
+        toast.info('أُلغيت إعادة التفريغ');
       } catch (err) {
         console.error('Failed to cancel retranscription:', err);
       }
@@ -292,55 +284,43 @@ export function RetranscribeDialog({
           </DialogTitle>
           <DialogDescription>
             {isProcessing
-              ? progress?.message || 'Processing audio...'
+              ? progress?.message || 'جارٍ معالجة الصوت...'
               : error
-                ? 'An error occurred during retranscription'
+                ? 'حدث خطأ أثناء إعادة التفريغ'
                 : 'Re-process the audio with different language settings'}
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
           {!isProcessing && !error && (
-            !isParakeetModel ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Language</span>
-                </div>
-                <Select value={selectedLang} onValueChange={setSelectedLang}>
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select language" />
-                  </SelectTrigger>
-                  <SelectContent className="max-h-60">
-                    {LANGUAGES.map((lang) => (
-                      <SelectItem key={lang.code} value={lang.code}>
-                        {lang.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <p className="text-xs text-muted-foreground">
-                  Select a specific language to improve accuracy, or use auto-detect
-                </p>
+            <div className="space-y-3">
+              <div className="flex items-center gap-2">
+                <Globe className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium">اللغة</span>
               </div>
-            ) : (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Globe className="h-4 w-4 text-muted-foreground" />
-                  <span className="text-sm font-medium">Language</span>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Language selection isn't supported for Parakeet. It always uses automatic detection.
-                </p>
-              </div>
-            )
+              <Select value={selectedLang} onValueChange={setSelectedLang}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="اختر اللغة" />
+                </SelectTrigger>
+                <SelectContent className="max-h-60">
+                  {LANGUAGES.map((lang) => (
+                    <SelectItem key={lang.code} value={lang.code}>
+                      {lang.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                اختر لغة محددة لتحسين الدقة، أو استخدم الاكتشاف التلقائي
+              </p>
+            </div>
           )}
 
           {!isProcessing && !error && availableModels.length > 0 && (
             <div className="space-y-3">
               <div className="flex items-center gap-2">
                 <Cpu className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Model</span>
+                <span className="text-sm font-medium">النموذج</span>
               </div>
               <Select value={selectedModelKey} onValueChange={setSelectedModelKey} disabled={loadingModels}>
                 <SelectTrigger className="w-full">

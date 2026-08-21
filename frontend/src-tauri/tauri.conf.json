@@ -1,8 +1,8 @@
 {
     "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
-    "productName": "meetily",
+    "productName": "نَبْرَة",
     "version": "0.4.0",
-    "identifier": "com.meetily.ai",
+    "identifier": "com.nabra.desktop",
     "build": {
         "frontendDist": "../out",
         "devUrl": "http://localhost:3118",
@@ -12,7 +12,7 @@
     "app": {
         "windows": [
             {
-                "title": "meetily",
+                "title": "نَبْرَة",
                 "width": 1100,
                 "height": 700,
                 "resizable": true,
@@ -27,7 +27,7 @@
                 "default-src": "'self'",
                 "style-src": "'self' 'unsafe-inline'",
                 "img-src": "'self' asset: https://asset.localhost data:",
-                "connect-src": "'self' http://localhost:11434 http://localhost:5167 http://localhost:8178 https://api.ollama.ai"
+                "connect-src": "'self' http://localhost:11434 http://localhost:5167 http://localhost:8178 http://127.0.0.1:8000 http://localhost:8000 https://api.ollama.ai"
             },
             "assetProtocol": {
                 "enable": true,
@@ -113,9 +113,7 @@
     "plugins": {
         "updater": {
             "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVDQTYzMUQ3ODc5N0M4MkEKUldRcXlKZUgxekdtN09DRkVWSHNpZlJseEVOUmpNd1dDSTNaLzZ3MXJGTnY3WW1pdnlOYjBpbkIK",
-            "endpoints": [
-                "https://github.com/Zackriya-Solutions/meeting-minutes/releases/latest/download/latest.json"
-            ]
+            "endpoints": []
         }
     }
 }

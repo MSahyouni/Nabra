@@ -1,10 +1,10 @@
 [package]
-name = "meetily"
+name = "nabra"
 version = "0.4.0"
-description = "A Tauri App for meeting minutes"
+description = "Nabra desktop app for Arabic meeting transcription and summaries"
 authors = ["Sujith S"]
 license = "MIT"
-repository = "https://github.com/Zackriya-Solutions/meeting-minutes"
+repository = ""
 edition = "2021"
 rust-version = "1.77"
 
@@ -101,10 +101,6 @@ nnnoiseless = "0.5"
 # to ensure correct GPU features are enabled per platform
 futures-util = "0.3"
 silero_rs = { git = "https://github.com/emotechlab/silero-rs", rev = "26a6460", package = "silero" }
-
-# Parakeet (ONNX-based fast transcription) dependencies
-ort = { version = "2.0.0-rc.10" }  # ONNX Runtime for Parakeet models
-thiserror = "2.0.16"                # Error handling for Parakeet
 
 # Async
 tokio = { version = "1.32.0", features = ["full", "tracing"] }

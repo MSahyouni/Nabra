@@ -30,12 +30,12 @@ export function SetupOverviewStep() {
     {
       number: 1,
       type: 'transcription',
-      title: 'Download Transcription Engine',
+      title: 'تنزيل محرّك التفريغ (مطلوب)',
     },
     {
       number: 2,
       type: 'summarization',
-      title: 'Download Summarization Engine',
+      title: 'التلخيص (اختياري)',
     },
   ];
 
@@ -45,8 +45,8 @@ export function SetupOverviewStep() {
 
   return (
     <OnboardingContainer
-      title="Setup Overview"
-      description="Meetily requires that you download the Transcription & Summarization AI models for the software to work."
+      title="نظرة عامة على الإعداد"
+      description="نزّل محرّك التفريغ لتسجيل الاجتماعات. التلخيص اختياري، ويمكنك اختيار مزوّد خارجي من الإعدادات."
       step={2}
       totalSteps={isMac ? 4 : 3}
     >
@@ -62,7 +62,7 @@ export function SetupOverviewStep() {
                 >
                   <div className="flex-1 ml-1">
                     <h3 className="font-medium text-gray-900 flex items-center gap-2">
-                        Step {step.number} :  {step.title}
+                        الخطوة {step.number}: {step.title}
 
                         {step.type === "summarization" && (
                             <TooltipProvider>
@@ -73,8 +73,7 @@ export function SetupOverviewStep() {
                                 </button>
                                 </TooltipTrigger>
                                 <TooltipContent className="max-w-xs text-sm">
-                                You can also select external AI providers like OpenAI, Claude, or
-                                Ollama for summary generation in settings.
+                                يمكنك أيضًا اختيار مزوّد ذكاء اصطناعي خارجي لإنشاء الملخصات من الإعدادات.
                                 </TooltipContent>
                             </Tooltip>
                             </TooltipProvider>
@@ -94,16 +93,16 @@ export function SetupOverviewStep() {
             onClick={handleContinue}
             className="w-full h-11 bg-gray-900 hover:bg-gray-800 text-white"
           >
-            Let's Go
+            متابعة
           </Button>
           <div className="text-center">
             <a
-              href="https://github.com/Zackriya-Solutions/meeting-minutes"
+              href="https://github.com/Zackriya-Solutions/nabra"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-gray-600 hover:underline"
             >
-              Report issues on GitHub
+              الإبلاغ عن مشكلة
             </a>
           </div>
         </div>

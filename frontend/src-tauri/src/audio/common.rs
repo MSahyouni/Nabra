@@ -17,7 +17,7 @@ pub(crate) async fn acquire_engine_lifecycle_lock() -> OwnedMutexGuard<()> {
 /// Unload the transcription engine after a batch job (import or retranscription).
 /// Skips unloading if a live recording is currently in progress, since recording
 /// uses the same global engine instances.
-pub(crate) async fn unload_engine_after_batch(use_parakeet: bool) {
+pub(crate) async fn unload_engine_after_batch() {
     let _engine_lifecycle_guard = acquire_engine_lifecycle_lock().await;
 
     if crate::audio::recording_commands::is_recording().await {
@@ -25,24 +25,13 @@ pub(crate) async fn unload_engine_after_batch(use_parakeet: bool) {
         return;
     }
 
-    if use_parakeet {
-        use crate::parakeet_engine::commands::PARAKEET_ENGINE;
-        let engine = {
-            let guard = PARAKEET_ENGINE.lock().unwrap_or_else(|e| e.into_inner());
-            guard.as_ref().cloned()
-        };
-        if let Some(e) = engine {
-            e.unload_model().await;
-        }
-    } else {
-        use crate::whisper_engine::commands::WHISPER_ENGINE;
-        let engine = {
-            let guard = WHISPER_ENGINE.lock().unwrap_or_else(|e| e.into_inner());
-            guard.as_ref().cloned()
-        };
-        if let Some(e) = engine {
-            e.unload_model().await;
-        }
+    use crate::whisper_engine::commands::WHISPER_ENGINE;
+    let engine = {
+        let guard = WHISPER_ENGINE.lock().unwrap_or_else(|e| e.into_inner());
+        guard.as_ref().cloned()
+    };
+    if let Some(e) = engine {
+        e.unload_model().await;
     }
 }
 
@@ -211,6 +200,55 @@ pub(crate) fn split_segment_at_silence(
     result
 }
 
+/// Merge short adjacent VAD segments so Whisper receives enough context.
+///
+/// Very short chunks are both slower overall and less accurate. This keeps
+/// natural boundaries while coalescing nearby speech into 4-12 second windows.
+pub(crate) fn merge_short_speech_segments(
+    segments: Vec<crate::audio::vad::SpeechSegment>,
+) -> Vec<crate::audio::vad::SpeechSegment> {
+    const SAMPLE_RATE: usize = 16000;
+    const MIN_TARGET_SAMPLES: usize = 4 * SAMPLE_RATE;
+    const MAX_MERGED_SAMPLES: usize = 12 * SAMPLE_RATE;
+    const MAX_GAP_MS: f64 = 900.0;
+
+    let mut merged = Vec::with_capacity(segments.len());
+    let mut current: Option<crate::audio::vad::SpeechSegment> = None;
+
+    for segment in segments {
+        let Some(mut active) = current.take() else {
+            current = Some(segment);
+            continue;
+        };
+
+        let gap_ms = segment.start_timestamp_ms - active.end_timestamp_ms;
+        let can_merge = active.samples.len() < MIN_TARGET_SAMPLES
+            && active.samples.len() + segment.samples.len() <= MAX_MERGED_SAMPLES
+            && gap_ms >= 0.0
+            && gap_ms <= MAX_GAP_MS;
+
+        if can_merge {
+            let silence_samples = ((gap_ms / 1000.0) * SAMPLE_RATE as f64).round() as usize;
+            if silence_samples > 0 {
+                active.samples.extend(std::iter::repeat(0.0).take(silence_samples));
+            }
+            active.samples.extend_from_slice(&segment.samples);
+            active.end_timestamp_ms = segment.end_timestamp_ms;
+            active.confidence = active.confidence.min(segment.confidence);
+            current = Some(active);
+        } else {
+            merged.push(active);
+            current = Some(segment);
+        }
+    }
+
+    if let Some(active) = current {
+        merged.push(active);
+    }
+
+    merged
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -232,5 +270,48 @@ mod tests {
 
         acquired_rx.await.unwrap();
         waiter.await.unwrap();
+    }
+
+    #[test]
+    fn merge_short_speech_segments_coalesces_nearby_chunks() {
+        let first = crate::audio::vad::SpeechSegment {
+            samples: vec![0.1; 16000],
+            start_timestamp_ms: 0.0,
+            end_timestamp_ms: 1000.0,
+            confidence: 0.8,
+        };
+        let second = crate::audio::vad::SpeechSegment {
+            samples: vec![0.1; 16000],
+            start_timestamp_ms: 1300.0,
+            end_timestamp_ms: 2300.0,
+            confidence: 0.7,
+        };
+
+        let merged = merge_short_speech_segments(vec![first, second]);
+
+        assert_eq!(merged.len(), 1);
+        assert_eq!(merged[0].start_timestamp_ms, 0.0);
+        assert_eq!(merged[0].end_timestamp_ms, 2300.0);
+        assert!(merged[0].samples.len() > 32000);
+    }
+
+    #[test]
+    fn merge_short_speech_segments_keeps_distant_chunks_separate() {
+        let first = crate::audio::vad::SpeechSegment {
+            samples: vec![0.1; 16000],
+            start_timestamp_ms: 0.0,
+            end_timestamp_ms: 1000.0,
+            confidence: 0.8,
+        };
+        let second = crate::audio::vad::SpeechSegment {
+            samples: vec![0.1; 16000],
+            start_timestamp_ms: 3000.0,
+            end_timestamp_ms: 4000.0,
+            confidence: 0.7,
+        };
+
+        let merged = merge_short_speech_segments(vec![first, second]);
+
+        assert_eq!(merged.len(), 2);
     }
 }

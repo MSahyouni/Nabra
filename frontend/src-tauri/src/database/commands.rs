@@ -104,7 +104,7 @@ pub async fn check_default_legacy_database(app: AppHandle) -> Result<Option<Stri
 }
 
 /// Check if the Homebrew database exists and return its size
-/// This is specifically for detecting old Python backend installations
+/// This is specifically for detecting old backend installations.
 #[tauri::command]
 pub async fn check_homebrew_database(path: String) -> Result<Option<DatabaseCheckResult>, String> {
     let db_path = PathBuf::from(&path);
@@ -204,11 +204,11 @@ pub async fn initialize_fresh_database(app: AppHandle) -> Result<(), String> {
         error!("Failed to set default summary model config: {}", e);
     }
 
-    // Default Transcription Model: Parakeet
+    // Default Transcription Model: Whisper tiny-q5_1 (smallest footprint)
     if let Err(e) = crate::database::repositories::setting::SettingsRepository::save_transcript_config(
         pool,
-        "parakeet",
-        crate::config::DEFAULT_PARAKEET_MODEL,
+        crate::config::DEFAULT_TRANSCRIPTION_PROVIDER,
+        crate::config::DEFAULT_WHISPER_MODEL,
     ).await {
         error!("Failed to set default transcription model config: {}", e);
     }

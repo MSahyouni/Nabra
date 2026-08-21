@@ -32,7 +32,7 @@ export function PermissionsStep() {
       try {
         await invoke('open_system_settings');
       } catch {
-        alert('Please enable microphone access in System Preferences > Security & Privacy > Microphone');
+        alert('فعّل الوصول إلى الميكروفون من إعدادات النظام ثم الخصوصية والأمان.');
       }
       return;
     }
@@ -64,7 +64,7 @@ export function PermissionsStep() {
       try {
         await invoke('open_system_settings');
       } catch {
-        alert('Please enable Audio Capture in System Settings → Privacy & Security → Audio Capture');
+        alert('فعّل التقاط الصوت من إعدادات النظام ثم الخصوصية والأمان.');
       }
       return;
     }
@@ -113,8 +113,8 @@ export function PermissionsStep() {
 
   return (
     <OnboardingContainer
-      title="Grant Permissions"
-      description="Meetily needs access to your microphone and system audio to record meetings"
+      title="منح الصلاحيات"
+      description="تحتاج نَبْرَة إلى الميكروفون وصوت النظام لتسجيل الاجتماعات"
       step={4}
       hideProgress={true}
       showNavigation={allPermissionsGranted}
@@ -126,8 +126,8 @@ export function PermissionsStep() {
           {/* Microphone */}
           <PermissionRow
             icon={<Mic className="w-5 h-5" />}
-            title="Microphone"
-            description="Required to capture your voice during meetings"
+            title="الميكروفون"
+            description="مطلوب لالتقاط صوتك أثناء الاجتماعات"
             status={permissions.microphone}
             isPending={isPending}
             onAction={handleMicrophoneAction}
@@ -136,8 +136,8 @@ export function PermissionsStep() {
           {/* System Audio */}
           <PermissionRow
             icon={<Volume2 className="w-5 h-5" />}
-            title="System Audio"
-            description="Click Enable to grant Audio Capture permission"
+            title="صوت النظام"
+            description="اضغط تفعيل لمنح صلاحية التقاط الصوت"
             status={permissions.systemAudio}
             isPending={isPending}
             onAction={handleSystemAudioAction}

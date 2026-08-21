@@ -42,13 +42,13 @@ export function EmptyStateSummary({ onGenerate, hasModel, isGenerating = false }
                 className="gap-2"
               >
                 <Sparkles className="w-4 h-4" />
-                {isGenerating ? 'Generating...' : 'Generate Summary'}
+                {isGenerating ? 'جارٍ الإنشاء...' : 'إنشاء الملخص'}
               </Button>
             </div>
           </TooltipTrigger>
           {!hasModel && (
             <TooltipContent>
-              <p>Please select a model in Settings first</p>
+              <p>اختر نموذجًا من الإعدادات أولًا</p>
             </TooltipContent>
           )}
         </Tooltip>

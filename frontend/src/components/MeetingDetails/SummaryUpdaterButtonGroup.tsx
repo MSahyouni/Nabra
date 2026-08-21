@@ -41,12 +41,12 @@ export function SummaryUpdaterButtonGroup({
         {isSaving ? (
           <>
             <Loader2 className="animate-spin" />
-            <span className="hidden lg:inline">Saving...</span>
+            <span className="hidden lg:inline">جارٍ الحفظ...</span>
           </>
         ) : (
           <>
             <Save />
-            <span className="hidden lg:inline">Save</span>
+            <span className="hidden lg:inline">حفظ</span>
           </>
         )}
       </Button>
@@ -64,7 +64,7 @@ export function SummaryUpdaterButtonGroup({
         className="cursor-pointer"
       >
         <Copy />
-        <span className="hidden lg:inline">Copy</span>
+        <span className="hidden lg:inline">نسخ</span>
       </Button>
 
       {/* Find button */}
@@ -81,7 +81,7 @@ export function SummaryUpdaterButtonGroup({
           className="cursor-pointer"
         >
           <Search />
-          <span className="hidden lg:inline">Find</span>
+          <span className="hidden lg:inline">بحث</span>
         </Button>
       )} */}
     </ButtonGroup>

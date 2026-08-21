@@ -65,7 +65,7 @@ export function SettingsModals({
         <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
           {/* Header */}
           <div className="flex justify-between items-center p-6 border-b">
-            <h3 className="text-xl font-semibold text-gray-900">Preferences</h3>
+            <h3 className="text-xl font-semibold text-gray-900">التفضيلات</h3>
             <button
               onClick={() => onClose("modelSettings")
               }
@@ -84,7 +84,7 @@ export function SettingsModals({
 
             {/* Divider */}
             <div className="border-t pt-8">
-              <h4 className="text-lg font-semibold text-gray-900 mb-4">AI Model Configuration</h4>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">إعداد نموذج الذكاء الاصطناعي</h4>
               <div className="space-y-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -103,12 +103,12 @@ export function SettingsModals({
                         });
                       }}
                     >
-                      <option value="builtin-ai">Built-in AI</option>
-                      <option value="claude">Claude</option>
-                      <option value="groq">Groq</option>
-                      <option value="ollama">Ollama</option>
-                      <option value="openrouter">OpenRouter</option>
-                      <option value="openai">OpenAI</option>
+                      <option value="builtin-ai">الذكاء الاصطناعي المدمج</option>
+                      <option value="claude">كلود</option>
+                      <option value="groq">غروك</option>
+                      <option value="ollama">أولاما</option>
+                      <option value="openrouter">أوبن راوتر</option>
+                      <option value="openai">أوبن إيه آي</option>
                     </select>
 
                     <select
@@ -126,7 +126,7 @@ export function SettingsModals({
                 </div>
                 {modelConfig.provider === 'ollama' && (
                   <div>
-                    <h4 className="text-lg font-bold mb-4">Available Ollama Models</h4>
+                    <h4 className="text-lg font-bold mb-4">نماذج أولاما المتاحة</h4>
                     {error && (
                       <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                         {error}
@@ -170,7 +170,7 @@ export function SettingsModals({
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Audio Device Settings</h3>
+            <h3 className="text-lg font-semibold text-gray-900">إعدادات أجهزة الصوت</h3>
             <button
               onClick={() => onClose('deviceSettings')}
               className="text-gray-500 hover:text-gray-700"
@@ -192,8 +192,8 @@ export function SettingsModals({
               onClick={() => {
                 const micDevice = selectedDevices.micDevice || 'Default';
                 const systemDevice = selectedDevices.systemDevice || 'Default';
-                toast.success("Devices selected", {
-                  description: `Microphone: ${micDevice}, System Audio: ${systemDevice}`
+                toast.success("تم اختيار الأجهزة", {
+                  description: `الميكروفون: ${micDevice}، صوت النظام: ${systemDevice}`
                 });
                 onClose('deviceSettings');
               }}
@@ -211,7 +211,7 @@ export function SettingsModals({
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 shadow-xl">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-900">Language Settings</h3>
+            <h3 className="text-lg font-semibold text-gray-900">إعدادات اللغة</h3>
             <button
               onClick={() => onClose('languageSettings')}
               className="text-gray-500 hover:text-gray-700"
@@ -248,7 +248,7 @@ export function SettingsModals({
           {/* Fixed Header */}
           <div className="flex justify-between items-center p-6 pb-4 border-b border-gray-200">
             <h3 className="text-lg font-semibold text-gray-900">
-              {messages.modelSelector ? 'Speech Recognition Setup Required' : 'Transcription Model Settings'}
+              {messages.modelSelector ? 'إعداد التعرّف على الكلام مطلوب' : 'إعدادات نموذج التفريغ'}
             </h3>
             <button
               onClick={() => onClose('modelSelector')}
@@ -283,8 +283,8 @@ export function SettingsModals({
                 <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-2 peer-focus:ring-blue-300 rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
               </label>
               <div>
-                <p className="text-sm font-medium text-gray-700">Show Confidence Indicators</p>
-                <p className="text-xs text-gray-500">Display colored dots showing transcription confidence quality</p>
+                <p className="text-sm font-medium text-gray-700">إظهار مؤشرات الثقة</p>
+                <p className="text-xs text-gray-500">عرض نقاط ملوّنة توضّح جودة الثقة في التفريغ</p>
               </div>
             </div>
 
@@ -303,7 +303,7 @@ export function SettingsModals({
     {modals.errorAlert && (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <Alert className="max-w-md mx-4 border-red-200 bg-white shadow-xl">
-          <AlertTitle className="text-red-800">Recording Stopped</AlertTitle>
+          <AlertTitle className="text-red-800">توقف التسجيل</AlertTitle>
           <AlertDescription className="text-red-700">
             {messages.errorAlert}
             <button
@@ -321,7 +321,7 @@ export function SettingsModals({
     {modals.chunkDropWarning && (
       <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <Alert className="max-w-lg mx-4 border-yellow-200 bg-white shadow-xl">
-          <AlertTitle className="text-yellow-800">Transcription Performance Warning</AlertTitle>
+          <AlertTitle className="text-yellow-800">تحذير بشأن أداء التفريغ</AlertTitle>
           <AlertDescription className="text-yellow-700">
             {messages.chunkDropWarning}
             <button

@@ -13,6 +13,19 @@ use tokio::io::AsyncWriteExt;
 use crate::config::WHISPER_MODEL_CATALOG;
 use super::acceleration::{whisper_context_acceleration_for, WhisperCompiledBackend};
 
+const NABRA_AR_INITIAL_PROMPT: &str = concat!(
+    "محضر اجتماع باللغة العربية واللهجة السورية. ",
+    "اكتب بوضوح مع فواصل طبيعية. ",
+    "مصطلحات شائعة: محضر اجتماع، تمويل، دعم غذائي، وجبات، دولار، صرف، ",
+    "تسجيل أسماء، مداخيل، منتجات مصنّعة، تلخيص، تفريغ صوتي."
+);
+
+#[derive(Debug, Clone, Copy)]
+pub enum TranscriptionMode {
+    Live,
+    Batch,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ModelStatus {
     Available,
@@ -119,7 +132,7 @@ impl WhisperEngine {
                 dirs::data_dir()
                     .or_else(|| dirs::home_dir())
                     .ok_or_else(|| anyhow!("Could not find system data directory"))?
-                    .join("Meetily")
+                    .join("Nabra")
                     .join("models")
             }
         };
@@ -512,8 +525,29 @@ impl WhisperEngine {
         repeated_words as f32 / total_words
     }
     
-    /// Transcribe audio with streaming support for partial results and adaptive quality
+    fn beam_size_for_mode(
+        adaptive_config: &crate::audio::AdaptiveWhisperConfig,
+        mode: TranscriptionMode,
+    ) -> i32 {
+        let beam_size = match mode {
+            TranscriptionMode::Live => adaptive_config.beam_size,
+            TranscriptionMode::Batch => (adaptive_config.beam_size + 2).min(6),
+        };
+
+        beam_size.max(1) as i32
+    }
+
+    /// Transcribe audio with streaming support for partial results and adaptive quality.
     pub async fn transcribe_audio_with_confidence(&self, audio_data: Vec<f32>, language: Option<String>) -> Result<(String, f32, bool)> {
+        self.transcribe_audio_with_confidence_mode(audio_data, language, TranscriptionMode::Live).await
+    }
+
+    pub async fn transcribe_audio_with_confidence_mode(
+        &self,
+        audio_data: Vec<f32>,
+        language: Option<String>,
+        mode: TranscriptionMode,
+    ) -> Result<(String, f32, bool)> {
         let ctx_lock = self.current_context.read().await;
         let ctx = ctx_lock.as_ref()
             .ok_or_else(|| anyhow!("No model loaded. Please load a model first."))?;
@@ -524,7 +558,7 @@ impl WhisperEngine {
 
         // ADAPTIVE parameters - optimized for current hardware
         let mut params = FullParams::new(SamplingStrategy::BeamSearch {
-            beam_size: adaptive_config.beam_size as i32,
+            beam_size: Self::beam_size_for_mode(&adaptive_config, mode),
             patience: 1.0
         });
 
@@ -533,12 +567,15 @@ impl WhisperEngine {
         // If language is "auto-translate", enable translation to English
         // Otherwise, use the specified language code
         let (language_code, should_translate) = match language.as_deref() {
-            Some("auto") | None => (None, false),
+            Some("auto") | None => (Some("ar"), false),
             Some("auto-translate") => (None, true),
             Some(lang) => (Some(lang), false),
         };
         params.set_language(language_code);
         params.set_translate(should_translate);
+        if !should_translate {
+            params.set_initial_prompt(NABRA_AR_INITIAL_PROMPT);
+        }
 
         // CRITICAL: Disable timestamp tokens to prevent whisper.cpp chunking heuristics
         // The "single timestamp ending - skip entire chunk" optimization incorrectly discards
@@ -556,15 +593,13 @@ impl WhisperEngine {
         // Additional suppression to reduce C library verbosity
         params.set_suppress_blank(true);
         params.set_suppress_non_speech_tokens(true);
-        params.set_temperature(adaptive_config.temperature);
+        params.set_temperature(0.0);
+        params.set_temperature_inc(0.2);
         params.set_max_initial_ts(1.0);
         params.set_entropy_thold(2.4);
-        params.set_logprob_thold(-1.0);
-        // BALANCED FIX: Lowered from 0.75 to 0.55 to allow quiet speech detection
-        // Previous value was too aggressive and rejected valid quiet speech
-        // 0.55 is balanced - prevents hallucinations while preserving quiet speech
-        params.set_no_speech_thold(0.55);
-        params.set_max_len(200);
+        params.set_logprob_thold(-0.9);
+        params.set_no_speech_thold(0.5);
+        params.set_max_len(224);
         params.set_single_segment(false);
 
         // Set thread count based on hardware (if supported by whisper.cpp)
@@ -619,7 +654,9 @@ impl WhisperEngine {
         }
 
         let final_result = result.trim().to_string();
-        let cleaned_result = Self::clean_repetitive_text(&final_result);
+        let cleaned_result = crate::audio::asr_polish::polish_transcript_ar(
+            &Self::clean_repetitive_text(&final_result)
+        );
 
         let avg_confidence = if segment_count > 0 {
             total_confidence / segment_count as f32
@@ -641,7 +678,7 @@ impl WhisperEngine {
 
         // ADAPTIVE parameters - optimized for current hardware
         let mut params = FullParams::new(SamplingStrategy::BeamSearch {
-            beam_size: adaptive_config.beam_size as i32,
+            beam_size: Self::beam_size_for_mode(&adaptive_config, TranscriptionMode::Live),
             patience: 1.0
         });
 
@@ -650,12 +687,15 @@ impl WhisperEngine {
         // If language is "auto-translate", enable translation to English
         // Otherwise, use the specified language code
         let (language_code, should_translate) = match language.as_deref() {
-            Some("auto") | None => (None, false),
+            Some("auto") | None => (Some("ar"), false),
             Some("auto-translate") => (None, true),
             Some(lang) => (Some(lang), false),
         };
         params.set_language(language_code);
         params.set_translate(should_translate);
+        if !should_translate {
+            params.set_initial_prompt(NABRA_AR_INITIAL_PROMPT);
+        }
 
         // CRITICAL: Disable timestamp tokens to prevent whisper.cpp chunking heuristics
         // The "single timestamp ending - skip entire chunk" optimization incorrectly discards
@@ -671,17 +711,15 @@ impl WhisperEngine {
         // BALANCED settings - good quality with reasonable speed
         params.set_suppress_blank(true);
         params.set_suppress_non_speech_tokens(true);
-        params.set_temperature(0.3);             // Lower than 0.4 for consistency, higher than 0.0 for quality
+        params.set_temperature(0.0);
+        params.set_temperature_inc(0.2);
         params.set_max_initial_ts(1.0);
         params.set_entropy_thold(2.4);
-        params.set_logprob_thold(-1.0);
-        // BALANCED FIX: Lowered from 0.75 to 0.55 to allow quiet speech detection
-        // Previous value was too aggressive and rejected valid quiet speech
-        // 0.55 is balanced - prevents hallucinations while preserving quiet speech
-        params.set_no_speech_thold(0.55);
+        params.set_logprob_thold(-0.9);
+        params.set_no_speech_thold(0.5);
 
         // Reasonable length limits
-        params.set_max_len(200);                 // Reasonable length
+        params.set_max_len(224);                 // Arabic meeting chunks can run slightly long
         params.set_single_segment(false);        // Allow multiple segments for better accuracy
 
         // Note: compression_ratio_threshold would be ideal but not available in current whisper-rs
@@ -779,7 +817,9 @@ impl WhisperEngine {
         let final_result = result.trim().to_string();
 
         // Check for repetition loops and clean them up
-        let cleaned_result = Self::clean_repetitive_text(&final_result);
+        let cleaned_result = crate::audio::asr_polish::polish_transcript_ar(
+            &Self::clean_repetitive_text(&final_result)
+        );
 
         // Performance optimization: smart logging for transcription results
         if cleaned_result.is_empty() {

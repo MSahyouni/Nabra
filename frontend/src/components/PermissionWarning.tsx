@@ -61,7 +61,7 @@ export function PermissionWarning({
             <div className="flex items-center gap-2">
               {!hasMicrophone && <Mic className="h-4 w-4" />}
               {!hasSystemAudio && <Speaker className="h-4 w-4" />}
-              {!hasMicrophone && !hasSystemAudio ? 'Permissions Required' : !hasMicrophone ? 'Microphone Permission Required' : 'System Audio Permission Required'}
+              {!hasMicrophone && !hasSystemAudio ? 'الأذونات مطلوبة' : !hasMicrophone ? 'إذن الميكروفون مطلوب' : 'إذن صوت النظام مطلوب'}
             </div>
           </AlertTitle>
           {/* Action Buttons */}
@@ -98,14 +98,14 @@ export function PermissionWarning({
             {!hasMicrophone && (
               <>
                 <p className="mb-3">
-                  Meetily needs access to your microphone to record meetings. No microphone devices were detected.
+                  تحتاج نَبْرَة إلى الميكروفون لتسجيل الاجتماعات. لم يتم العثور على أي ميكروفون.
                 </p>
                 <div className="space-y-2 text-sm mb-4">
-                  <p className="font-medium">Please check:</p>
+                  <p className="font-medium">تحقق من الآتي:</p>
                   <ul className="list-disc list-inside ml-2 space-y-1">
-                    <li>Your microphone is connected and powered on</li>
-                    <li>Microphone permission is granted in System Settings</li>
-                    <li>No other app is exclusively using the microphone</li>
+                    <li>الميكروفون متصل ويعمل</li>
+                    <li>صلاحية الميكروفون ممنوحة من إعدادات النظام</li>
+                    <li>لا يوجد تطبيق آخر يحتكر استخدام الميكروفون</li>
                   </ul>
                 </div>
               </>
@@ -116,16 +116,16 @@ export function PermissionWarning({
               <>
                 <p className="mb-3">
                   {hasMicrophone
-                    ? 'System audio capture is not available. You can still record with your microphone, but computer audio won\'t be captured.'
-                    : 'System audio capture is also not available.'}
+                    ? 'التقاط صوت النظام غير متاح. يمكنك التسجيل بالميكروفون، لكن صوت الجهاز لن يلتقط.'
+                    : 'التقاط صوت النظام غير متاح أيضًا.'}
                 </p>
                 {isMacOS && (
                   <div className="space-y-2 text-sm mb-4">
-                    <p className="font-medium">To enable system audio on macOS:</p>
+                    <p className="font-medium">لتفعيل صوت النظام على macOS:</p>
                     <ul className="list-disc list-inside ml-2 space-y-1">
-                      <li>Install a virtual audio device (e.g., BlackHole 2ch)</li>
-                      <li>Grant Screen Recording permission to Meetily</li>
-                      <li>Configure your audio routing in Audio MIDI Setup</li>
+                      <li>ثبّت جهاز صوت افتراضي مثل BlackHole 2ch</li>
+                      <li>امنح صلاحية تسجيل الشاشة لنَبْرَة</li>
+                      <li>اضبط مسار الصوت من Audio MIDI Setup</li>
                     </ul>
                   </div>
                 )}

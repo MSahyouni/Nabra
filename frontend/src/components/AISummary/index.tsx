@@ -541,7 +541,7 @@ export const AISummary = ({ summary, status, error, onSummaryChange, onRegenerat
     const newSummary: Summary = {
       ...currentSummary,
       [newSectionKey]: {
-        title: 'New Section',
+        title: 'قسم جديد',
         blocks: [{
           id: newBlockId,
           type: 'text' as const,
@@ -558,12 +558,12 @@ export const AISummary = ({ summary, status, error, onSummaryChange, onRegenerat
   };
 
   const convertToMarkdown = () => {
-    let markdown = `# AI Generated Summary of Meeting: ${meeting?.id || 'Unknown'} - ${meeting?.title || 'Untitled Meeting'}\n\n`;
+    let markdown = `# ملخص ذكي للاجتماع: ${meeting?.id || 'غير معروف'} - ${meeting?.title || 'اجتماع بلا عنوان'}\n\n`;
     markdown += `## Date: ${meeting?.created_at ? new Date(meeting.created_at).toLocaleDateString() : new Date().toLocaleDateString()}\n\n`;
     
     Object.entries(currentSummary).forEach(([key, section]) => {
       if (key === 'title') {
-        markdown = `# ${section.title || 'AI Enhanced Summary'}\n\n`;
+        markdown = `# ${section.title || 'ملخص محسّن بالذكاء الاصطناعي'}\n\n`;
       } else {
         markdown += `## ${section.title || key}\n\n`;
         section.blocks.forEach(block => {
@@ -609,10 +609,10 @@ export const AISummary = ({ summary, status, error, onSummaryChange, onRegenerat
     <div className="w-full p-4 bg-red-50 border border-red-200 rounded-lg">
       <div className="flex items-center mb-2">
         <ExclamationTriangleIcon className="h-5 w-5 text-red-500 mr-2" />
-        <h3 className="text-red-700 font-medium">Error Generating Summary</h3>
+        <h3 className="text-red-700 font-medium">خطأ في إنشاء الملخص</h3>
       </div>
       <p className="text-red-600 text-sm">{error}</p>
-      <p className="text-red-500 text-xs mt-2">Please check your model configuration and API keys, or try again.</p>
+      <p className="text-red-500 text-xs mt-2">تحقق من إعداد النموذج ومفاتيح الواجهة البرمجية، أو حاول مجددًا.</p>
     </div>
   );
 
@@ -622,12 +622,12 @@ export const AISummary = ({ summary, status, error, onSummaryChange, onRegenerat
         <div className="animate-spin rounded-full h-5 w-5 border-2 border-blue-500 border-t-transparent"></div>
         <div>
           <h3 className="text-blue-700 font-medium">
-            {status === 'processing' ? 'Processing Transcript' : 'Generating Summary'}
+            {status === 'processing' ? 'جارٍ معالجة التفريغ' : 'جارٍ إنشاء الملخص'}
           </h3>
           <p className="text-blue-600 text-sm">
             {status === 'processing' 
-              ? 'Analyzing your transcript...' 
-              : 'Creating a detailed summary of your meeting...'}
+              ? 'جارٍ تحليل التفريغ...'
+              : 'جارٍ إنشاء ملخص مفصل للاجتماع...'}
           </p>
         </div>
       </div>
@@ -649,8 +649,8 @@ export const AISummary = ({ summary, status, error, onSummaryChange, onRegenerat
   if (!hasContent && status === 'completed') {
     return (
       <div className="w-full p-4 bg-gray-50 border border-gray-200 rounded-lg text-center">
-        <p className="text-gray-600">No summary content available.</p>
-        <p className="text-gray-500 text-sm mt-1">Try generating a new summary.</p>
+        <p className="text-gray-600">لا يوجد محتوى ملخص متاح.</p>
+        <p className="text-gray-500 text-sm mt-1">حاول إنشاء ملخص جديد.</p>
       </div>
     );
   }
@@ -775,7 +775,7 @@ export const AISummary = ({ summary, status, error, onSummaryChange, onRegenerat
             className="px-2 py-1 text-sm bg-gray-100 hover:bg-gray-200 rounded-md flex items-center space-x-1"
           >
             <span>📋</span>
-            <span>Copy</span>
+            <span>نسخ</span>
           </button>
           <button
             onClick={onRegenerateSummary}
@@ -785,7 +785,7 @@ export const AISummary = ({ summary, status, error, onSummaryChange, onRegenerat
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            <span className="ml-1">Regenerate</span>
+            <span className="ml-1">إعادة الإنشاء</span>
           </button>
         </div>
       </div> */}

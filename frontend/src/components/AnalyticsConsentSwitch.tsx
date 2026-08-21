@@ -147,7 +147,7 @@ export default function AnalyticsConsentSwitch() {
 
   const handlePrivacyPolicyClick = async () => {
     try {
-      await invoke('open_external_url', { url: 'https://github.com/Zackriya-Solutions/meeting-minutes/blob/main/PRIVACY_POLICY.md' });
+      await invoke('open_external_url', { url: 'https://github.com/Zackriya-Solutions/nabra/blob/main/PRIVACY_POLICY.md' });
     } catch (error) {
       console.error('Failed to open privacy policy link:', error);
     }
@@ -157,7 +157,7 @@ export default function AnalyticsConsentSwitch() {
     <>
       <div className="space-y-4">
         <div>
-          <h3 className="text-base font-semibold text-gray-800 mb-2">Usage Analytics</h3>
+          <h3 className="text-base font-semibold text-gray-800 mb-2">تحليلات الاستخدام</h3>
           <p className="text-sm text-gray-600 mb-4">
             Usage analytics is off by default. You can turn it on to share anonymous product and performance data; no personal content is collected.
           </p>
@@ -165,9 +165,9 @@ export default function AnalyticsConsentSwitch() {
 
         <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200">
           <div>
-            <h4 className="font-semibold text-gray-800">Enable Analytics</h4>
+            <h4 className="font-semibold text-gray-800">تفعيل التحليلات</h4>
             <p className="text-sm text-gray-600">
-              {isProcessing ? 'Updating...' : 'Off unless you choose to enable it'}
+              {isProcessing ? 'جارٍ التحديث...' : 'متوقفة ما لم تختر تفعيلها'}
             </p>
           </div>
           <div className="flex items-center gap-2 ml-4">
@@ -187,7 +187,7 @@ export default function AnalyticsConsentSwitch() {
           <div className="p-4 border rounded-lg bg-gray-50">
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1 min-w-0">
-                <div className="font-medium text-gray-800 mb-1">Your User ID</div>
+                <div className="font-medium text-gray-800 mb-1">معرّف المستخدم الخاص بك</div>
                 <p className="text-xs text-gray-600 mb-2">
                   Share this ID when reporting issues to help us investigate your issue logs
                 </p>
@@ -205,12 +205,12 @@ export default function AnalyticsConsentSwitch() {
                     {isCopied ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-green-600" />
-                        <span className="text-green-600">Copied!</span>
+                        <span className="text-green-600">تم النسخ!</span>
                       </>
                     ) : (
                       <>
                         <Copy className="w-3.5 h-3.5" />
-                        <span>Copy</span>
+                        <span>نسخ</span>
                       </>
                     )}
                   </Button>

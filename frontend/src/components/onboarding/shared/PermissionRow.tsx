@@ -11,7 +11,7 @@ export function PermissionRow({ icon, title, description, status, isPending = fa
 
   const getButtonText = () => {
     if (isChecking) return 'Checking...';
-    if (isDenied) return 'Open Settings';
+    if (isDenied) return 'فتح الإعدادات';
     return 'Enable';
   };
 

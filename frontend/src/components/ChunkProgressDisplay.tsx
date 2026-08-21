@@ -154,28 +154,28 @@ export function ChunkProgressDisplay({
           <div className="text-lg font-semibold text-green-600">
             {progress.completed_chunks}
           </div>
-          <div className="text-gray-600">Completed</div>
+          <div className="text-gray-600">مكتمل</div>
         </div>
 
         <div className="text-center">
           <div className="text-lg font-semibold text-blue-600">
             {progress.processing_chunks}
           </div>
-          <div className="text-gray-600">Processing</div>
+          <div className="text-gray-600">قيد المعالجة</div>
         </div>
 
         <div className="text-center">
           <div className="text-lg font-semibold text-gray-600">
             {progress.total_chunks - progress.completed_chunks - progress.processing_chunks - progress.failed_chunks}
           </div>
-          <div className="text-gray-600">Pending</div>
+          <div className="text-gray-600">قيد الانتظار</div>
         </div>
 
         <div className="text-center">
           <div className="text-lg font-semibold text-red-600">
             {progress.failed_chunks}
           </div>
-          <div className="text-gray-600">Failed</div>
+          <div className="text-gray-600">فشل</div>
         </div>
       </div>
 

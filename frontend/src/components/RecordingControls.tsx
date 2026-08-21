@@ -77,7 +77,7 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
         console.log('Tauri is initialized and ready, is_recording result:', result);
       } catch (error) {
         console.error('Tauri initialization error:', error);
-        alert('Failed to initialize recording. Please check the console for details.');
+        alert('فشل تجهيز التسجيل. تحقق من إعدادات الصوت.');
       }
     };
     checkTauri();
@@ -113,25 +113,30 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
       const errorMsg = error instanceof Error ? error.message : String(error);
 
       // Check for device-related errors
-      if (errorMsg.includes('microphone') || errorMsg.includes('mic') || errorMsg.includes('input')) {
+      if (errorMsg.includes('Device not found') || errorMsg.includes('No microphone') || errorMsg.toLowerCase().includes('microphone')) {
         setDeviceError({
-          title: 'Microphone Not Available',
-          message: 'Unable to access your microphone. Please check that:\n• Your microphone is connected\n• The app has microphone permissions\n• No other app is using the microphone'
+          title: 'الميكروفون غير متاح',
+          message: 'تعذر الوصول إلى الميكروفون. يرجى:\n• فتح الإعدادات ← التسجيل واختيار الميكروفون\n• منح صلاحية الميكروفون\n• على WSL/Linux، شغّل نسخة نَبْرَة الخاصة بويندوز لدعم الصوت'
+        });
+      } else if (errorMsg.includes('microphone') || errorMsg.includes('mic') || errorMsg.includes('input')) {
+        setDeviceError({
+          title: 'الميكروفون غير متاح',
+          message: 'تعذّر الوصول إلى الميكروفون. تحقق من توصيله، ومنح التطبيق إذن استخدامه، وعدم استخدامه في تطبيق آخر.'
         });
       } else if (errorMsg.includes('system audio') || errorMsg.includes('speaker') || errorMsg.includes('output')) {
         setDeviceError({
-          title: 'System Audio Not Available',
-          message: 'Unable to capture system audio. Please check that:\n• A virtual audio device (like BlackHole) is installed\n• The app has screen recording permissions (macOS)\n• System audio is properly configured'
+          title: 'صوت النظام غير متاح',
+          message: 'تعذّر التقاط صوت النظام. تحقق من إعداد جهاز الصوت ومنح الأذونات المطلوبة.'
         });
       } else if (errorMsg.includes('permission')) {
         setDeviceError({
-          title: 'Permission Required',
-          message: 'Recording permissions are required. Please:\n• Grant microphone access in System Settings\n• Grant screen recording access for system audio (macOS)\n• Restart the app after granting permissions'
+          title: 'الإذن مطلوب',
+          message: 'يلزم منح أذونات التسجيل والميكروفون من إعدادات النظام، ثم إعادة تشغيل التطبيق.'
         });
       } else {
         setDeviceError({
-          title: 'Recording Failed',
-          message: 'Unable to start recording. Please check your audio device settings and try again.'
+          title: 'فشل التسجيل',
+          message: 'تعذّر بدء التسجيل. تحقق من إعدادات أجهزة الصوت ثم حاول مجددًا.'
         });
       }
     }
@@ -213,7 +218,7 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
       console.log('Recording paused successfully');
     } catch (error) {
       console.error('Failed to pause recording:', error);
-      alert('Failed to pause recording. Please check the console for details.');
+      alert('تعذّر إيقاف التسجيل مؤقتًا.');
     } finally {
       setIsPausing(false);
     }
@@ -231,7 +236,7 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
       console.log('Recording resumed successfully');
     } catch (error) {
       console.error('Failed to resume recording:', error);
-      alert('Failed to resume recording. Please check the console for details.');
+      alert('تعذّر استئناف التسجيل.');
     } finally {
       setIsResuming(false);
     }
@@ -346,7 +351,7 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
           {isProcessing && !isParentProcessing ? (
             <div className="flex items-center space-x-2">
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-gray-900"></div>
-              <span className="text-sm text-gray-600">Processing recording...</span>
+              <span className="text-sm text-gray-600">جارٍ معالجة التسجيل...</span>
             </div>
           ) : (
             <>
@@ -408,7 +413,7 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
                         </button>
                       </TooltipTrigger>
                       <TooltipContent>
-                        <p>Start recording</p>
+                        <p>بدء التسجيل</p>
                       </TooltipContent>
                     </Tooltip>
                   ) : (
@@ -441,7 +446,7 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
                           </button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>{isPaused ? 'Resume recording' : 'Pause recording'}</p>
+                          <p>{isPaused ? 'استئناف التسجيل' : 'إيقاف التسجيل مؤقتًا'}</p>
                         </TooltipContent>
                       </Tooltip>
 
@@ -465,7 +470,7 @@ export const RecordingControls: React.FC<RecordingControlsProps> = ({
                           </button>
                         </TooltipTrigger>
                         <TooltipContent>
-                          <p>Stop recording</p>
+                          <p>إيقاف التسجيل</p>
                         </TooltipContent>
                       </Tooltip>
                     </>

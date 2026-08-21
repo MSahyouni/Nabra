@@ -32,28 +32,28 @@ const COMMANDS: CommandOption[] = [
     label: 'Text', 
     type: 'text', 
     icon: 'T', 
-    description: 'Just start writing with plain text' 
+    description: 'ابدأ الكتابة بنص عادي'
   },
   { 
     id: 'bullet', 
-    label: 'Bullet List', 
+    label: 'قائمة نقطية',
     type: 'bullet', 
     icon: '•', 
-    description: 'Create a bulleted list' 
+    description: 'إنشاء قائمة نقطية'
   },
   { 
     id: 'h1', 
     label: 'Heading 1', 
     type: 'heading1', 
     icon: 'H1', 
-    description: 'Big section heading' 
+    description: 'عنوان قسم كبير'
   },
   { 
     id: 'h2', 
     label: 'Heading 2', 
     type: 'heading2', 
     icon: 'H2', 
-    description: 'Medium section heading' 
+    description: 'عنوان قسم متوسط'
   },
 ];
 

@@ -103,10 +103,10 @@ export default function PageContent({
       const { emit } = await import('@tauri-apps/api/event');
       await emit('model-config-updated', config);
 
-      toast.success('Model settings saved successfully');
+      toast.success('تم حفظ إعدادات النموذج بنجاح');
     } catch (error) {
       console.error('Failed to save model config:', error);
-      toast.error('Failed to save model settings');
+      toast.error('فشل حفظ إعدادات النموذج');
     }
   };
 

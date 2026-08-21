@@ -122,6 +122,31 @@ pub async fn get_device_and_config(
 
         let host = cpal::default_host();
 
+        // PulseAudio/ALSA report the default device as literally named "default".
+        // Resolve via cpal's default device APIs instead of enumerating by name.
+        if audio_device.name == "default" {
+            return match audio_device.device_type {
+                DeviceType::Input => {
+                    let device = host
+                        .default_input_device()
+                        .ok_or_else(|| anyhow!("No default input device found"))?;
+                    let default_config = device
+                        .default_input_config()
+                        .map_err(|e| anyhow!("Failed to get default input config: {}", e))?;
+                    Ok((device, default_config))
+                }
+                DeviceType::Output => {
+                    let device = host
+                        .default_output_device()
+                        .ok_or_else(|| anyhow!("No default output device found"))?;
+                    let default_config = device
+                        .default_output_config()
+                        .map_err(|e| anyhow!("Failed to get default output config: {}", e))?;
+                    Ok((device, default_config))
+                }
+            };
+        }
+
         match audio_device.device_type {
             DeviceType::Input => {
                 for device in host.input_devices()? {

@@ -123,7 +123,7 @@ export default function AnalyticsDataModal({ isOpen, onClose, onConfirmDisable }
             <pre className="text-xs text-gray-700 overflow-x-auto">
               {`{
   "event": "meeting_ended",
-  "app_version": "0.4.0",
+  "app_version": "0.6.0",
   "transcription_provider": "localWhisper",
   "transcription_model": "large-v3",
   "summary_provider": "ollama",

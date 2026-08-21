@@ -1,7 +1,7 @@
 {
     "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
     "productName": "نَبْرَة",
-    "version": "0.4.0",
+    "version": "0.6.0",
     "identifier": "com.nabra.desktop",
     "build": {
         "frontendDist": "../out",

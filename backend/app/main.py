@@ -37,7 +37,7 @@ if not logger.handlers:
 app = FastAPI(
     title="Meeting Summarizer API",
     description="API for processing and summarizing meeting transcripts",
-    version="1.0.0"
+    version="0.6.0"
 )
 
 # Configure CORS

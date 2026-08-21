@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
+    <Version>0.6.0</Version>
+    <AssemblyVersion>0.6.0.0</AssemblyVersion>
+    <FileVersion>0.6.0.0</FileVersion>
     <TargetFramework>net10.0-windows</TargetFramework>
     <!-- OOP BA is launched by Burn as its own process; publish per-RID so mbanative.dll resolves. -->
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>

@@ -1,6 +1,6 @@
 [package]
 name = "nabra"
-version = "0.4.0"
+version = "0.6.0"
 description = "Nabra desktop app for Arabic meeting transcription and summaries"
 authors = ["Sujith S"]
 license = "MIT"

@@ -75,7 +75,7 @@ public static class SystemAdminApprovalService
             using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(20) };
             var request = new SystemAdminApprovalRequest(
                 Product: "Nabrh",
-                Version: typeof(SystemAdminApprovalService).Assembly.GetName().Version?.ToString() ?? "0.4.0",
+                Version: typeof(SystemAdminApprovalService).Assembly.GetName().Version?.ToString() ?? "0.6.0",
                 Action: "install",
                 ApprovalCode: approvalCode.Trim(),
                 DeviceId: CreateDeviceId(),

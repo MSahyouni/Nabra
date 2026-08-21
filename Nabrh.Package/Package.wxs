@@ -6,7 +6,7 @@
        default (1252) silently stripped every Arabic character from the summary. -->
   <Package Name="نبرة — المساعد الذكي للاجتماعات"
            Manufacturer="نبرة للذكاء الاصطناعي"
-           Version="0.4.0.0"
+           Version="0.6.0.0"
            UpgradeCode="BF7D3411-E2C3-489D-A64E-104BE510F082"
            Scope="perMachine"
            Language="1025"

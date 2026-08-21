@@ -23,7 +23,7 @@ dotnet build .\Nabrh.Installer\Nabrh.Installer.wixproj -c Release `
 ```json
 {
   "product": "Nabrh",
-  "version": "0.4.0.0",
+  "version": "0.6.0.0",
   "action": "install",
   "approvalCode": "one-time-code",
   "deviceId": "SHA256-DEVICE-ID",

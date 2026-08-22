@@ -287,13 +287,18 @@ pub async fn pull_ollama_model<R: Runtime>(
         "stream": true
     });
 
-    let response = client
+    let response_result = client
         .post(&url)
         .json(&payload)
         .timeout(Duration::from_secs(600)) // 10 minutes timeout for pulling
         .send()
-        .await
-        .map_err(|e| {
+        .await;
+
+    let response = match response_result {
+        Ok(response) => response,
+        Err(error) => {
+            let error_msg = {
+                let e = &error;
             if e.is_timeout() {
                 format!("Download timed out. The model may be large, please try using the Ollama CLI: ollama pull {}", model_name)
             } else if e.is_connect() {
@@ -301,7 +306,22 @@ pub async fn pull_ollama_model<R: Runtime>(
             } else {
                 format!("Failed to download model: {}", e)
             }
-        })?;
+            };
+
+            {
+                let mut downloading = DOWNLOADING_MODELS.write().await;
+                downloading.remove(&model_name);
+            }
+            let _ = app_handle.emit(
+                "ollama-model-download-error",
+                serde_json::json!({
+                    "modelName": model_name,
+                    "error": error_msg
+                }),
+            );
+            return Err(error_msg);
+        }
+    };
 
     if !response.status().is_success() {
         let status = response.status();
@@ -330,26 +350,25 @@ pub async fn pull_ollama_model<R: Runtime>(
     let mut buffer = String::new();
     let mut last_progress = 0u8;
 
-    while let Some(chunk) = stream.next().await {
-        let chunk = chunk.map_err(|e| {
-            let error_msg = format!("Failed to read stream: {}", e);
-
-            // Remove from downloading set on stream error
-            let model_name_clone = model_name.clone();
-            tokio::spawn(async move {
+    while let Some(chunk_result) = stream.next().await {
+        let chunk = match chunk_result {
+            Ok(chunk) => chunk,
+            Err(error) => {
+                let error_msg = format!("Failed to read stream: {}", error);
                 let mut downloading = DOWNLOADING_MODELS.write().await;
-                downloading.remove(&model_name_clone);
-            });
+                downloading.remove(&model_name);
+                drop(downloading);
 
-            let _ = app_handle.emit(
-                "ollama-model-download-error",
-                serde_json::json!({
-                    "modelName": model_name,
-                    "error": error_msg
-                }),
-            );
-            error_msg
-        })?;
+                let _ = app_handle.emit(
+                    "ollama-model-download-error",
+                    serde_json::json!({
+                        "modelName": model_name,
+                        "error": error_msg
+                    }),
+                );
+                return Err(error_msg);
+            }
+        };
 
         buffer.push_str(&String::from_utf8_lossy(&chunk));
 
@@ -370,10 +389,11 @@ pub async fn pull_ollama_model<R: Runtime>(
                     json.get("total").and_then(|v| v.as_u64()),
                 ) {
                     if total > 0 {
-                        let progress = ((completed as f64 / total as f64) * 100.0) as u8;
+                        let progress = ((completed as f64 / total as f64) * 100.0)
+                            .clamp(0.0, 100.0) as u8;
 
                         // Only emit if progress changed significantly (reduces event spam)
-                        if progress != last_progress && (progress - last_progress >= 1 || progress == 100) {
+                        if progress > last_progress || progress == 100 {
                             log::info!("Ollama download progress for {}: {}%", model_name, progress);
 
                             let _ = app_handle.emit(

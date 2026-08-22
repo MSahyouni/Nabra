@@ -37,7 +37,15 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr :3118 2^>nul') do (
 )
 
 REM Set libclang path for whisper-rs-sys
-set "LIBCLANG_PATH=C:\Program Files\LLVM\bin"
+if exist "C:\Program Files\LLVM\bin\libclang.dll" (
+    set "LIBCLANG_PATH=C:\Program Files\LLVM\bin"
+) else if exist "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\Llvm\x64\bin\libclang.dll" (
+    set "LIBCLANG_PATH=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\Llvm\x64\bin"
+) else if exist "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\Llvm\x64\bin\libclang.dll" (
+    set "LIBCLANG_PATH=C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\Llvm\x64\bin"
+) else if exist "C:\Program Files (x86)\Microsoft Visual Studio\2022\Community\VC\Tools\Llvm\x64\bin\libclang.dll" (
+    set "LIBCLANG_PATH=C:\Program Files (x86)\Microsoft Visual Studio\2022\Community\VC\Tools\Llvm\x64\bin"
+)
 
 REM Try to find and setup Visual Studio environment
 echo 🔧 Setting up Visual Studio environment...

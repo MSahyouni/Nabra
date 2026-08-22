@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <!-- Codepage is the MSI *database* codepage; 65001/UTF-8 is not valid for it.
+       Note the summary-information stream is controlled separately, by
+       WixLocalization/@Codepage in Package.en-us.wxl - leaving that at the en-US
+       default (1252) silently stripped every Arabic character from the summary. -->
+  <Package Name="نبرة — المساعد الذكي للاجتماعات"
+           Manufacturer="نبرة للذكاء الاصطناعي"
+           Version="0.6.0.0"
+           UpgradeCode="BF7D3411-E2C3-489D-A64E-104BE510F082"
+           Scope="perMachine"
+           Language="1025"
+           Codepage="1256"
+           InstallerVersion="500">
+
+    <MajorUpgrade DowngradeErrorMessage="إصدار أحدث من تطبيق نبرة مثبت بالفعل على هذا الجهاز." />
+
+    <!-- The supported install route is the signed Burn bootstrapper, which obtains this value
+         from the central approval server. Installed allows repair and uninstall to remain
+         recoverable even if that server is unavailable. -->
+    <Launch Condition="Installed OR NABRH_APPROVAL_TOKEN" Message="يتطلب تثبيت نبرة تصريحاً من مشرفي النظام عبر معالج التثبيت المعتمد." />
+
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <!-- Standard Windows Folders -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="Nabrh" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="نبرة" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder" />
+
+    <!-- Application Icon -->
+    <Icon Id="AppIcon" SourceFile="$(var.ProjectDir)..\Assets\app.ico" />
+
+    <!-- Components -->
+    <ComponentGroup Id="ProductComponents" Directory="INSTALLFOLDER">
+      <!-- Main Application Executable -->
+      <Component Id="MainAppExecutable" Guid="*" Bitness="always64">
+        <File Id="Nabrh.exe" Source="$(var.NabrhAppDir)\nabra.exe" KeyPath="yes" />
+      </Component>
+
+      <!-- Sidecar / Helper Binaries -->
+      <Component Id="FfmpegBinary" Guid="*" Bitness="always64">
+        <File Id="Ffmpeg.exe" Source="$(var.NabrhAppDir)\ffmpeg.exe" KeyPath="yes" />
+      </Component>
+
+      <Component Id="LlamaHelperBinary" Guid="*" Bitness="always64">
+        <File Id="LlamaHelper.exe" Source="$(var.NabrhAppDir)\llama-helper.exe" KeyPath="yes" />
+      </Component>
+
+      <!-- Windows-only isolated COM bridge. It is self-contained so Nabrh does not acquire
+           a machine-wide .NET runtime prerequisite merely to export a meeting to Word. -->
+      <Component Id="WordExporterBinary" Guid="*" Bitness="always64">
+        <File Id="Nabrh.WordExporter.exe"
+              Source="$(var.WordExporterDir)\Nabrh.WordExporter.exe"
+              KeyPath="yes" />
+      </Component>
+
+      <!-- Start Menu Shortcut -->
+      <Component Id="AppStartMenuShortcutComponent" Directory="ApplicationProgramsFolder" Guid="*" Bitness="always64">
+        <Shortcut Id="ApplicationStartMenuShortcut"
+                  Name="نبرة"
+                  Description="نبرة — المساعد الذكي للاجتماعات"
+                  Target="[!Nabrh.exe]"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="AppIcon" />
+        <RemoveFolder Id="CleanApplicationProgramsFolder" Directory="ApplicationProgramsFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\Nabrh\Install" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+
+      <!-- Desktop Shortcut -->
+      <Component Id="AppDesktopShortcutComponent" Directory="DesktopFolder" Guid="*" Bitness="always64">
+        <Shortcut Id="ApplicationDesktopShortcut"
+                  Name="نبرة"
+                  Description="نبرة — المساعد الذكي للاجتماعات"
+                  Target="[!Nabrh.exe]"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="AppIcon" />
+        <RegistryValue Root="HKCU" Key="Software\Nabrh\Install" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Main Feature -->
+    <Feature Id="MainFeature" Title="نبرة (Nabrh Core)" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+  </Package>
+</Wix>

@@ -50,6 +50,7 @@ pub mod groq;
 pub mod openrouter;
 pub mod state;
 pub mod summary;
+pub mod word_export;
 pub mod tray;
 pub mod utils;
 pub mod whisper_engine;
@@ -654,6 +655,8 @@ pub fn run() {
             summary::summary_engine::commands::builtin_ai_is_model_ready,
             summary::summary_engine::commands::builtin_ai_get_available_summary_model,
             summary::summary_engine::commands::builtin_ai_get_recommended_model,
+            word_export::word_export_capability,
+            word_export::export_meeting_to_word,
             openrouter::get_openrouter_models,
             audio::recording_preferences::get_recording_preferences,
             audio::recording_preferences::set_recording_preferences,

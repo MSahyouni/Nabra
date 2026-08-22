@@ -1,0 +1,418 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml">
+
+    <!--
+      WPF-UI's dictionaries are merged HERE, not alongside this file in
+      BootstrapperResources.xaml.
+
+      A StaticResource inside a merged ResourceDictionary resolves against that
+      dictionary and its own MergedDictionaries only - never against sibling
+      dictionaries merged into the same parent. With the WPF-UI dictionaries as
+      siblings, `BasedOn="{StaticResource {x:Type ui:TextBox}}"` below could not see
+      them, and because compiled BAML defers StaticResource resolution to first use,
+      the failure surfaced only when the first ui:TextBox was templated - i.e. the
+      wizard crashed with a XamlParseException on the Activation step, three steps in.
+
+      Native WPF types (TextBox, MenuItem, ComboBox...) were unaffected because their
+      type-keyed lookups fall back to the system theme style; ui: types have no such
+      fallback.
+    -->
+    <ResourceDictionary.MergedDictionaries>
+        <ui:ThemesDictionary Theme="Light" />
+        <ui:ControlsDictionary />
+    </ResourceDictionary.MergedDictionaries>
+
+    <!-- Sidebar colors (Figma node 1:19010) -->
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="#042623"/>
+    <SolidColorBrush x:Key="SidebarTextBrush" Color="#B9A779"/>
+    <SolidColorBrush x:Key="SidebarActiveItemBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="SidebarActiveTextBrush" Color="#B9A779"/>
+    <SolidColorBrush x:Key="SidebarBorderBrush" Color="#1A3D38"/>
+    <!-- Backs the privacy-note card in the sidebar footer (MainWindow.xaml). It was referenced
+         but never defined, and because DynamicResource fails silently the card rendered with no
+         background at all - invisible against SidebarBackgroundBrush. Sits one step lighter than
+         that background, matching SidebarBorderBrush's relationship to it. -->
+    <SolidColorBrush x:Key="SidebarCardBrush" Color="#0C302B"/>
+
+    <!-- Header Blended Theme Brushes -->
+    <SolidColorBrush x:Key="HeaderBackgroundBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="HeaderTitleBrush" Color="#15332E"/>
+    <SolidColorBrush x:Key="HeaderSubtitleBrush" Color="#66736C"/>
+    <SolidColorBrush x:Key="HeaderControlBackgroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="HeaderControlBorderBrush" Color="#E7ECE8"/>
+    <SolidColorBrush x:Key="HeaderControlTextBrush" Color="#15332E"/>
+    <SolidColorBrush x:Key="HeaderControlIconBrush" Color="#66736C"/>
+
+    <!-- Global Fonts -->
+    <FontFamily x:Key="QomraFont">pack://application:,,,/Assets/#ITF Qomra Arabic</FontFamily>
+
+    <!-- Global WPF-UI System Font Family Overrides (Prevents Segoe UI fallback across all text controls while preserving icon fonts) -->
+    <FontFamily x:Key="ContentControlThemeFontFamily">pack://application:,,,/Assets/#ITF Qomra Arabic</FontFamily>
+    <FontFamily x:Key="TextControlThemeFontFamily">pack://application:,,,/Assets/#ITF Qomra Arabic</FontFamily>
+    <FontFamily x:Key="HeaderFontFamily">pack://application:,,,/Assets/#ITF Qomra Arabic</FontFamily>
+    <FontFamily x:Key="SubheaderFontFamily">pack://application:,,,/Assets/#ITF Qomra Arabic</FontFamily>
+    <!-- Global CornerRadius Design Tokens (Executive / Fluent Standards) -->
+    <CornerRadius x:Key="HeroCardCornerRadius">22</CornerRadius>
+    <CornerRadius x:Key="CardCornerRadius">20</CornerRadius>
+    <CornerRadius x:Key="SubCardCornerRadius">18</CornerRadius>
+    <CornerRadius x:Key="OverlayCornerRadius">16</CornerRadius>
+    <CornerRadius x:Key="ChipCornerRadius">14</CornerRadius>
+    <CornerRadius x:Key="ControlCornerRadius">10</CornerRadius>
+    <CornerRadius x:Key="BadgeCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="PillCornerRadius">9999</CornerRadius>
+    <Style TargetType="{x:Type Control}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+    </Style>
+
+    <Style TargetType="{x:Type ContentControl}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+    </Style>
+
+    <Style TargetType="{x:Type Label}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+    </Style>
+
+    <Style TargetType="{x:Type Button}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+    </Style>
+
+    <Style TargetType="{x:Type ui:SymbolIcon}">
+        <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets"/>
+    </Style>
+
+    <!-- Global Backgrounds: Solid White (#FFFFFF) base + senior-management-bg-pattern.png overlay -->
+    <DrawingBrush x:Key="PageBackgroundPatternBrush" Stretch="None" TileMode="Tile" Viewport="0,0,364.5,243" ViewportUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,364.5,243" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <ImageDrawing ImageSource="pack://application:,,,/Assets/figma/senior-management-bg-pattern.png" Rect="0,0,364.5,243" />
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <DrawingBrush x:Key="PageBackgroundBrush" Stretch="None" TileMode="Tile" Viewport="0,0,364.5,243" ViewportUnits="Absolute">
+        <DrawingBrush.Drawing>
+            <DrawingGroup>
+                <GeometryDrawing Brush="#FFFFFF">
+                    <GeometryDrawing.Geometry>
+                        <RectangleGeometry Rect="0,0,364.5,243" />
+                    </GeometryDrawing.Geometry>
+                </GeometryDrawing>
+                <ImageDrawing ImageSource="pack://application:,,,/Assets/figma/senior-management-bg-pattern.png" Rect="0,0,364.5,243" />
+            </DrawingGroup>
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+
+    <!-- Global RTL & Rounded Styles for Popups -->
+    <Style TargetType="{x:Type ToolTip}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="FlowDirection" Value="RightToLeft"/>
+        <Setter Property="Background" Value="#15332E"/>
+        <Setter Property="Foreground" Value="#FFFFFF"/>
+        <Setter Property="Padding" Value="10,6"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToolTip}">
+                    <Border Background="#15332E" BorderBrush="#1A3D38" BorderThickness="1" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter TextElement.Foreground="#FFFFFF" TextElement.FontFamily="{StaticResource QomraFont}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type ContextMenu}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="FlowDirection" Value="RightToLeft"/>
+        <Setter Property="Background" Value="#FFFFFF"/>
+        <Setter Property="BorderBrush" Value="#E5E7EB"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="Foreground" Value="#111827"/>
+        <Setter Property="Padding" Value="4"/>
+    </Style>
+
+    <Style TargetType="{x:Type ScrollViewer}">
+        <Setter Property="FlowDirection" Value="RightToLeft"/>
+    </Style>
+
+    <Style TargetType="{x:Type ui:DynamicScrollViewer}">
+        <Setter Property="FlowDirection" Value="RightToLeft"/>
+    </Style>
+
+    <!-- Global Base Styles for Inner Pages & Controls (DPI Aware & Crisp Pixel Snapping) -->
+    <Style TargetType="{x:Type Window}">
+        <Setter Property="TextElement.FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="FlowDirection" Value="RightToLeft"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+    </Style>
+
+    <Style TargetType="{x:Type Page}">
+        <Setter Property="TextElement.FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="FlowDirection" Value="RightToLeft"/>
+        <Setter Property="Background" Value="{DynamicResource PageBackgroundBrush}"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+    </Style>
+
+    <Style TargetType="{x:Type UserControl}">
+        <Setter Property="TextElement.FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="FlowDirection" Value="RightToLeft"/>
+        <Setter Property="UseLayoutRounding" Value="True"/>
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality"/>
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+    </Style>
+
+    <!-- Global WPF-UI TextControl Brush Overrides (Prevents OS Dark Theme Solid Black Fallback) -->
+    <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#FAFAFA"/>
+    <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="TextControlForeground" Color="#15332E"/>
+    <SolidColorBrush x:Key="TextControlForegroundFocused" Color="#15332E"/>
+    <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="#15332E"/>
+    <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="#66736C"/>
+    <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="#66736C"/>
+    <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="#66736C"/>
+    <SolidColorBrush x:Key="TextControlElevationBorderBrush" Color="#E7ECE8"/>
+    <SolidColorBrush x:Key="TextControlElevationBorderBrushPointerOver" Color="#042623"/>
+    <SolidColorBrush x:Key="TextControlElevationBorderBrushFocused" Color="#042623"/>
+    <SolidColorBrush x:Key="TextControlFocusedBorderBrush" Color="#042623"/>
+
+    <!-- Global ComboBox & Dropdown Popup Brush Overrides (Prevents OS Dark Theme / Acrylic Solid Black Fallback) -->
+    <SolidColorBrush x:Key="ComboBoxDropDownBackground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="ComboBoxDropDownBorderBrush" Color="#E7ECE8"/>
+    <SolidColorBrush x:Key="ComboBoxDropDownGlyphForeground" Color="#66736C"/>
+    <SolidColorBrush x:Key="ComboBoxBackground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="ComboBoxBackgroundPointerOver" Color="#FAFAFA"/>
+    <SolidColorBrush x:Key="ComboBoxBackgroundFocused" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="ComboBoxForeground" Color="#15332E"/>
+    <SolidColorBrush x:Key="ComboBoxForegroundPointerOver" Color="#15332E"/>
+    <SolidColorBrush x:Key="ComboBoxItemBackground" Color="Transparent"/>
+    <SolidColorBrush x:Key="ComboBoxItemBackgroundPointerOver" Color="#F6F9F7"/>
+    <SolidColorBrush x:Key="ComboBoxItemBackgroundSelected" Color="#E3E9E5"/>
+    <SolidColorBrush x:Key="ComboBoxItemForeground" Color="#15332E"/>
+    <SolidColorBrush x:Key="ComboBoxItemForegroundSelected" Color="#15332E"/>
+    <SolidColorBrush x:Key="ComboBoxItemPillFillBrush" Color="#042623"/>
+    <SolidColorBrush x:Key="ComboBoxBorderBrushFocused" Color="#042623"/>
+    <SolidColorBrush x:Key="FlyoutBackground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="FlyoutBorderBrush" Color="#E5E7EB"/>
+    <SolidColorBrush x:Key="ContextMenuBackground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="ContextMenuForeground" Color="#111827"/>
+    <SolidColorBrush x:Key="ContextMenuBorderBrush" Color="#E5E7EB"/>
+    <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="MenuBarItemBackgroundSelected" Color="#E8ECE9"/>
+    <SolidColorBrush x:Key="MenuBarItemBackgroundPressed" Color="#DDE5E0"/>
+    <SolidColorBrush x:Key="MenuBarItemTextForegroundPressed" Color="#042623"/>
+    <SolidColorBrush x:Key="MenuItemHeaderForeground" Color="#111827"/>
+    <SolidColorBrush x:Key="MenuFlyoutItemForeground" Color="#111827"/>
+
+    <!-- Global High-Contrast Arabic ContextMenu for Text Inputs (Cut / Copy / Paste) -->
+    <ContextMenu x:Key="DefaultControlContextMenu" FlowDirection="RightToLeft" Background="#FFFFFF" BorderBrush="#E5E7EB" BorderThickness="1" Padding="4">
+        <MenuItem Header="قص" Command="ApplicationCommands.Cut" Icon="{ui:SymbolIcon Cut24}" InputGestureText="Ctrl+X" FontSize="13" Foreground="#111827" Margin="2,1"/>
+        <MenuItem Header="نسخ" Command="ApplicationCommands.Copy" Icon="{ui:SymbolIcon Copy24}" InputGestureText="Ctrl+C" FontSize="13" Foreground="#111827" Margin="2,1"/>
+        <MenuItem Header="لصق" Command="ApplicationCommands.Paste" Icon="{ui:SymbolIcon ClipboardPaste24}" InputGestureText="Ctrl+V" FontSize="13" Foreground="#111827" Margin="2,1"/>
+    </ContextMenu>
+
+    <Style TargetType="{x:Type MenuItem}" BasedOn="{StaticResource {x:Type MenuItem}}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="Foreground" Value="#111827"/>
+        <Setter Property="FontSize" Value="13"/>
+    </Style>
+
+    <!-- Global TextBox & ui:TextBox Crisp Light Styling, Smooth 12px CornerRadius & RTL Right Alignment -->
+    <Style TargetType="{x:Type TextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="Border.CornerRadius" Value="12"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="MinHeight" Value="42"/>
+    </Style>
+
+    <Style TargetType="{x:Type ui:TextBox}" BasedOn="{StaticResource {x:Type ui:TextBox}}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="Border.CornerRadius" Value="12"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="MinHeight" Value="42"/>
+    </Style>
+
+    <!-- Pill-shaped Search Box Style (20px CornerRadius for Header and Search Bars) -->
+    <Style x:Key="PillSearchBoxStyle" TargetType="{x:Type ui:TextBox}" BasedOn="{StaticResource {x:Type ui:TextBox}}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="Background" Value="{DynamicResource HeaderControlBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource HeaderControlBorderBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource HeaderControlTextBrush}"/>
+        <Setter Property="Border.CornerRadius" Value="20"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="MinHeight" Value="40"/>
+    </Style>
+
+    <Style TargetType="{x:Type PasswordBox}" BasedOn="{StaticResource {x:Type PasswordBox}}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="Border.CornerRadius" Value="12"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="MinHeight" Value="42"/>
+    </Style>
+
+    <Style TargetType="{x:Type ui:PasswordBox}" BasedOn="{StaticResource {x:Type ui:PasswordBox}}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBackgroundBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource CardBorderBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="Border.CornerRadius" Value="12"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="MinHeight" Value="42"/>
+    </Style>
+
+    <Style TargetType="{x:Type ComboBox}" BasedOn="{StaticResource {x:Type ComboBox}}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="Border.CornerRadius" Value="12"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="Padding" Value="14,0"/>
+        <Setter Property="MinHeight" Value="40"/>
+    </Style>
+
+    <Style TargetType="{x:Type DatePicker}" BasedOn="{StaticResource {x:Type DatePicker}}">
+        <Setter Property="FontFamily" Value="{StaticResource QomraFont}"/>
+        <Setter Property="Foreground" Value="{DynamicResource PrimaryTextBrush}"/>
+        <Setter Property="Border.CornerRadius" Value="12"/>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Left"/>
+        <Setter Property="MinHeight" Value="42"/>
+    </Style>
+
+    <!-- Content area colors -->
+    <SolidColorBrush x:Key="SolidPageBackgroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="CardBorderBrush" Color="#E7ECE8"/>
+    <SolidColorBrush x:Key="PrimaryTextBrush" Color="#15332E"/>
+    <!-- Secondary/Muted darkened from Figma (#7A8680 / #8C958F) to meet WCAG 4.5:1 on white at small sizes -->
+    <SolidColorBrush x:Key="SecondaryTextBrush" Color="#66736C"/>
+    <SolidColorBrush x:Key="MutedTextBrush" Color="#707A74"/>
+
+    <!-- Tinted sub-surfaces (nested cards, pill backgrounds) -->
+    <SolidColorBrush x:Key="SurfaceTintBrush" Color="#F6F9F7"/>
+    <SolidColorBrush x:Key="SurfaceTintBorderBrush" Color="#E3E9E5"/>
+    <SolidColorBrush x:Key="ProgressTrackBrush" Color="#DDE5E0"/>
+
+    <!-- Chips -->
+    <SolidColorBrush x:Key="ChipBorderBrush" Color="#D7DED9"/>
+    <SolidColorBrush x:Key="ChipTextBrush" Color="#47524D"/>
+
+    <!-- Status colors -->
+    <SolidColorBrush x:Key="StatusGreenBrush" Color="#2C7B5A"/>
+    <SolidColorBrush x:Key="StatusRedBrush" Color="#DC2626"/>
+    <SolidColorBrush x:Key="StatusOrangeBrush" Color="#D88B2F"/>
+    <SolidColorBrush x:Key="StatusGoldBrush" Color="#99721D"/>
+    <SolidColorBrush x:Key="StatusBlueBrush" Color="#3B82F6"/>
+
+    <!-- Button / accent -->
+    <SolidColorBrush x:Key="PrimaryButtonBrush" Color="#1B3A2D"/>
+    <SolidColorBrush x:Key="PrimaryButtonHoverBrush" Color="#25503E"/>
+    <SolidColorBrush x:Key="AccentGoldBrush" Color="#B9A779"/>
+    <!-- Text placed on PrimaryButton/Sidebar dark-green surfaces -->
+    <SolidColorBrush x:Key="OnPrimaryTextBrush" Color="#FFFFFF"/>
+
+    <!-- Input -->
+    <SolidColorBrush x:Key="InputPlaceholderBrush" Color="#66736C"/>
+
+    <!-- Role Level Brushes (from Figma 1-18070) -->
+    <SolidColorBrush x:Key="RoleGoldBrush" Color="#D97706"/>
+    <SolidColorBrush x:Key="RoleGoldBgBrush" Color="#FFFBEB"/>
+    <SolidColorBrush x:Key="RoleSilverBrush" Color="#6B7280"/>
+    <SolidColorBrush x:Key="RoleSilverBgBrush" Color="#F9FAFB"/>
+    <SolidColorBrush x:Key="RoleBronzeBrush" Color="#2563EB"/>
+    <SolidColorBrush x:Key="RoleBronzeBgBrush" Color="#EFF6FF"/>
+    <SolidColorBrush x:Key="RoleGreenBrush" Color="#042623"/>
+    <SolidColorBrush x:Key="RoleGreenBgBrush" Color="#F0F7F4"/>
+
+    <!-- Shadows -->
+    <Color x:Key="CardShadowColor">#14000000</Color>
+
+    <!-- WPF-UI System Accent Color Overrides to Brand Dark Green #042623 (Eliminates all blue button/hover effects) -->
+    <Color x:Key="SystemAccentColor">#042623</Color>
+    <Color x:Key="SystemAccentColorPrimary">#042623</Color>
+    <Color x:Key="SystemAccentColorSecondary">#1B3A2D</Color>
+    <Color x:Key="SystemAccentColorTertiary">#25503E</Color>
+    <Color x:Key="AccentFillColorDefault">#042623</Color>
+    <Color x:Key="AccentFillColorSecondary">#1B3A2D</Color>
+    <Color x:Key="AccentFillColorTertiary">#25503E</Color>
+    <SolidColorBrush x:Key="AccentFillColorDefaultBrush" Color="#042623" />
+    <SolidColorBrush x:Key="AccentFillColorSecondaryBrush" Color="#1B3A2D" />
+    <SolidColorBrush x:Key="AccentFillColorTertiaryBrush" Color="#25503E" />
+    <SolidColorBrush x:Key="AccentTextFillColorPrimaryBrush" Color="#042623" />
+    <SolidColorBrush x:Key="AccentTextFillColorSecondaryBrush" Color="#1B3A2D" />
+    <SolidColorBrush x:Key="AccentTextFillColorTertiaryBrush" Color="#25503E" />
+
+    <!-- WPF-UI Global Button & Control Hover Color Overrides (Replaces Windows Blue Hover with Soft Brand Green #E8ECE9 & Ensures High-Contrast Text) -->
+    <SolidColorBrush x:Key="ButtonBackground" Color="#F9FAFB" />
+    <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="#E8ECE9" />
+    <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="#DDE5E0" />
+    <SolidColorBrush x:Key="ButtonForeground" Color="#1F2937" />
+    <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#042623" />
+    <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#042623" />
+    <SolidColorBrush x:Key="AccentButtonBackground" Color="#042623" />
+    <SolidColorBrush x:Key="AccentButtonBackgroundPointerOver" Color="#25503E" />
+    <SolidColorBrush x:Key="AccentButtonBackgroundPressed" Color="#1B3A2D" />
+    <SolidColorBrush x:Key="AccentButtonForeground" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="AccentButtonForegroundPointerOver" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="AccentButtonForegroundPressed" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="TextOnAccentFillColorPrimaryBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="TextOnAccentFillColorSecondaryBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ControlFillColorSecondary" Color="#E8ECE9" />
+    <SolidColorBrush x:Key="ControlFillColorSecondaryBrush" Color="#E8ECE9" />
+    <SolidColorBrush x:Key="SubtleFillColorSecondary" Color="#E8ECE9" />
+    <SolidColorBrush x:Key="SubtleFillColorSecondaryBrush" Color="#E8ECE9" />
+    <SolidColorBrush x:Key="SubtleFillColorTertiary" Color="#DDE5E0" />
+    <SolidColorBrush x:Key="SubtleFillColorTertiaryBrush" Color="#DDE5E0" />
+    <SolidColorBrush x:Key="HyperlinkButtonBackgroundPointerOver" Color="#E8ECE9" />
+    <SolidColorBrush x:Key="HyperlinkButtonForegroundPointerOver" Color="#042623" />
+    <SolidColorBrush x:Key="HyperlinkButtonForegroundPressed" Color="#1B3A2D" />
+    <SolidColorBrush x:Key="ListBoxItemSelectedBackgroundThemeBrush" Color="#042623" />
+    <SolidColorBrush x:Key="ListViewItemBackgroundPointerOver" Color="#E8ECE9" />
+    <SolidColorBrush x:Key="ListViewItemPillFillBrush" Color="#042623" />
+    <SolidColorBrush x:Key="CardBackgroundPointerOver" Color="#FAFAFA" />
+
+    <!-- WPF-UI ToggleSwitch Brand Color Overrides (Replaces Windows Blue with Brand Dark Emerald #042623) -->
+    <SolidColorBrush x:Key="ToggleSwitchFillOn" Color="#042623" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnPointerOver" Color="#1B3A2D" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOnPressed" Color="#0A1913" />
+    <SolidColorBrush x:Key="ToggleSwitchKnobFillOn" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="ToggleSwitchKnobFillOff" Color="#66736C" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOff" Color="#E3E9E5" />
+    <SolidColorBrush x:Key="ToggleSwitchFillOffPointerOver" Color="#D5DDD8" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOff" Color="#C2CCC6" />
+    <SolidColorBrush x:Key="ToggleSwitchStrokeOn" Color="#042623" />
+
+</ResourceDictionary>
+

@@ -1,0 +1,120 @@
+<Project Sdk="WixToolset.Sdk/7.0.0">
+  <PropertyGroup>
+    <OutputType>Bundle</OutputType>
+    <AcceptEula>wix7</AcceptEula>
+
+    <!-- Default to x64 so a plain `dotnet build` cannot quietly produce a second, different
+         bundle. Without this, building without -p:Platform=x64 emitted an x86 Burn bundle to
+         bin\Release\ alongside the real one in bin\x64\Release\ — and the stale copy is the one
+         that got double-clicked, which is how a build predating the Detect() fix ended up in a
+         bug report. -->
+    <Platform Condition="'$(Platform)' == '' or '$(Platform)' == 'AnyCPU'">x64</Platform>
+    <Platforms>x64</Platforms>
+    <OutputName>Nabrh.Installer.Online</OutputName>
+
+    <!-- The supported distribution is online: signed vendor bootstrapper executables are
+         cached and embedded at build time; WebView2 and NVIDIA download their runtime payloads
+         only when Burn detects that the target needs them. -->
+    <OnlineBundle Condition="'$(OnlineBundle)' == ''">true</OnlineBundle>
+    <PrerequisiteCacheDir>$(MSBuildProjectDirectory)\obj\$(Platform)\$(Configuration)\online-prerequisites\</PrerequisiteCacheDir>
+    <OnlineVcRedistExe>$(PrerequisiteCacheDir)VC_redist.x64.exe</OnlineVcRedistExe>
+    <OnlineWebView2Exe>$(PrerequisiteCacheDir)MicrosoftEdgeWebview2Setup.exe</OnlineWebView2Exe>
+    <OnlineCudaNetworkExe>$(PrerequisiteCacheDir)cuda_12.1.0_windows_network.exe</OnlineCudaNetworkExe>
+
+    <!-- Where the self-contained, single-file BA is published. Bundle.wxs consumes this
+         through the BaPublishDir bind variable below. Trailing slash is required. -->
+    <BaPublishDir>$(MSBuildProjectDirectory)\..\Nabrh.Bootstrapper\bin\publish-ba\</BaPublishDir>
+    <ApprovalServerUrl Condition="'$(ApprovalServerUrl)' == ''">https://approval.invalid/api/v1/install/authorize</ApprovalServerUrl>
+    <DefineConstants>$(DefineConstants);BaPublishDir=$(BaPublishDir);ApprovalServerUrl=$(ApprovalServerUrl)</DefineConstants>
+    <DefineConstants Condition="'$(OnlineBundle)' == 'true'">$(DefineConstants);VcRedistExe=$(OnlineVcRedistExe);WebView2Exe=$(OnlineWebView2Exe);CudaNetworkExe=$(OnlineCudaNetworkExe)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WixToolset.BootstrapperApplications.wixext" Version="7.0.0" />
+    <!-- util:RegistrySearch used to detect the installed .NET Desktop Runtime. -->
+    <PackageReference Include="WixToolset.Util.wixext" Version="7.0.0" />
+  </ItemGroup>
+
+  <Target Name="DownloadOnlinePrerequisites" BeforeTargets="CoreCompile" Condition="'$(OnlineBundle)' == 'true'">
+    <MakeDir Directories="$(PrerequisiteCacheDir)" />
+    <DownloadFile SourceUrl="https://aka.ms/vc14/vc_redist.x64.exe"
+                  DestinationFolder="$(PrerequisiteCacheDir)"
+                  DestinationFileName="VC_redist.x64.exe"
+                  SkipUnchangedFiles="true" />
+    <DownloadFile SourceUrl="https://go.microsoft.com/fwlink/p/?LinkId=2124703"
+                  DestinationFolder="$(PrerequisiteCacheDir)"
+                  DestinationFileName="MicrosoftEdgeWebview2Setup.exe"
+                  SkipUnchangedFiles="true" />
+    <DownloadFile SourceUrl="https://developer.download.nvidia.com/compute/cuda/12.1.0/network_installers/cuda_12.1.0_windows_network.exe"
+                  DestinationFolder="$(PrerequisiteCacheDir)"
+                  DestinationFileName="cuda_12.1.0_windows_network.exe"
+                  SkipUnchangedFiles="true" />
+
+    <Error Condition="!Exists('$(OnlineVcRedistExe)')" Text="Failed to download the Visual C++ x64 Redistributable." />
+    <Error Condition="!Exists('$(OnlineWebView2Exe)')" Text="Failed to download the WebView2 Evergreen bootstrapper." />
+    <Error Condition="!Exists('$(OnlineCudaNetworkExe)')" Text="Failed to download the NVIDIA CUDA 12.1 network installer." />
+    <Message Importance="high" Text="Nabrh.Installer.Online: vendor prerequisite bootstrappers are ready in $(PrerequisiteCacheDir)" />
+  </Target>
+
+  <!-- WiX lays out every uncompressed RemotePayload beside the bundle after binding. The online
+       distribution intentionally ships one EXE, so retain the harvested source in obj but remove
+       the optional local layout copy from bin after a successful build. Burn then uses DownloadUrl. -->
+  <Target Name="RemoveOnlineRemotePayloadLayout" AfterTargets="Build" Condition="'$(OnlineBundle)' == 'true'">
+    <Delete Files="$(OutputPath)cuda_12.1.0_windows_network.exe" />
+    <Message Importance="high" Text="Nabrh.Installer.Online: removed CUDA local layout copy; Burn will download it from NVIDIA when required." />
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Nabrh.Package\Nabrh.Package.wixproj" />
+    <!-- ReferenceOutputAssembly=false: the bundle consumes the *published* single-file BA from
+         BaPublishDir, not the ordinary build output. The reference is kept so the BA is built
+         (and so build ordering is correct) but its TargetDir is deliberately not used. -->
+    <ProjectReference Include="..\Nabrh.Bootstrapper\Nabrh.Bootstrapper.csproj" ReferenceOutputAssembly="false" />
+  </ItemGroup>
+
+  <!-- Publish the BA self-contained + single-file before the bundle is linked.
+       Without this the bundle would embed a stale (or framework-dependent) BA. -->
+  <Target Name="PublishBootstrapperApplication" BeforeTargets="CoreCompile">
+    <MSBuild Projects="..\Nabrh.Bootstrapper\Nabrh.Bootstrapper.csproj"
+             Targets="Publish"
+             Properties="Configuration=$(Configuration);Platform=AnyCPU;RuntimeIdentifier=win-x64;SelfContained=true;PublishSingleFile=true;IncludeNativeLibrariesForSelfExtract=true;EnableCompressionInSingleFile=true;PublishDir=$(BaPublishDir)" />
+
+    <Error Condition="!Exists('$(BaPublishDir)Nabrh.Bootstrapper.exe')"
+           Text="Bootstrapper application was not published to $(BaPublishDir). The bundle cannot be built without it." />
+    <Message Importance="high" Text="Nabrh.Installer: using self-contained BA from $(BaPublishDir)" />
+  </Target>
+
+  <!-- The redistributable prerequisites in Bundle.wxs sit behind <?ifdef?> guards, so a plain
+       `dotnet build` quietly produces a bundle that chains nothing but the MSI. That is fine for
+       local iteration and wrong for a release, and previously nothing said so. Warn on every
+       build; fail only when ReleaseBundle=true.
+
+       To chain them:
+         dotnet build Nabrh.Installer\Nabrh.Installer.wixproj -c Release -p:ReleaseBundle=true ^
+           -p:DefineConstants="VcRedistExe=C:\redist\VC_redist.x64.exe;WebView2Exe=C:\redist\MicrosoftEdgeWebview2Setup.exe" -->
+  <Target Name="WarnOnMissingPrerequisites" BeforeTargets="CoreCompile">
+    <PropertyGroup>
+      <_HasVcRedist Condition="$(DefineConstants.Contains('VcRedistExe='))">true</_HasVcRedist>
+      <_HasWebView2 Condition="$(DefineConstants.Contains('WebView2Exe='))">true</_HasWebView2>
+      <_HasCudaRuntime Condition="$(DefineConstants.Contains('CudaNetworkExe='))">true</_HasCudaRuntime>
+    </PropertyGroup>
+
+    <Warning Condition="'$(_HasVcRedist)' != 'true' and '$(ReleaseBundle)' != 'true'"
+             Text="VcRedistExe is not defined: the bundle will NOT chain the VC++ 2015-2022 x64 Redistributable. nabra.exe will fail to start on a machine without it." />
+    <Warning Condition="'$(_HasWebView2)' != 'true' and '$(ReleaseBundle)' != 'true'"
+             Text="WebView2Exe is not defined: the bundle will NOT chain the WebView2 Evergreen Runtime. The app will install but show no window on LTSC/Server SKUs." />
+    <Warning Condition="'$(_HasCudaRuntime)' != 'true' and '$(ReleaseBundle)' != 'true'"
+             Text="CudaNetworkExe is not defined: the bundle cannot install CUDA Runtime 12.1/cuBLAS when they are missing." />
+    <Warning Condition="'$(ApprovalServerUrl)' == 'https://approval.invalid/api/v1/install/authorize' and '$(ReleaseBundle)' != 'true'"
+             Text="ApprovalServerUrl is still the fail-closed placeholder. Interactive installs will be denied until a real HTTPS endpoint is supplied." />
+
+    <Error Condition="'$(_HasVcRedist)' != 'true' and '$(ReleaseBundle)' == 'true'"
+           Text="ReleaseBundle=true requires -p:DefineConstants=&quot;VcRedistExe=&lt;path to VC_redist.x64.exe&gt;&quot;." />
+    <Error Condition="'$(_HasWebView2)' != 'true' and '$(ReleaseBundle)' == 'true'"
+           Text="ReleaseBundle=true requires -p:DefineConstants=&quot;WebView2Exe=&lt;path to MicrosoftEdgeWebview2Setup.exe&gt;&quot;." />
+    <Error Condition="'$(_HasCudaRuntime)' != 'true' and '$(ReleaseBundle)' == 'true'"
+           Text="ReleaseBundle=true requires CudaNetworkExe, or use the default -p:OnlineBundle=true build." />
+    <Error Condition="'$(ApprovalServerUrl)' == 'https://approval.invalid/api/v1/install/authorize' and '$(ReleaseBundle)' == 'true'"
+           Text="ReleaseBundle=true requires -p:ApprovalServerUrl=https://your-server/api/v1/install/authorize." />
+  </Target>
+</Project>

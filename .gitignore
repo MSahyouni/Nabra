@@ -5,6 +5,8 @@
 # dependencies
 /node_modules
 **/models
+!Nabrh.Bootstrapper/Models/
+!Nabrh.Bootstrapper/Models/*.cs
 /.pnp
 .pnp.*
 .yarn/*
@@ -75,9 +77,28 @@ node_modules/
 experiments/
 .cursor/
 target/
+/releases/
 
 frontend/src-tauri/binaries/
 
 # Local package cache and development recordings
 .pnpm-store/
 frontend/src-tauri/meetily-recordings/
+
+# .NET / WiX MBA build output
+[Bb]in/
+[Oo]bj/
+.vs/
+.wix/
+*.wixobj
+*.wixpdb
+*.msi
+*.msm
+*.msp
+*.cab
+*_wpftmp.csproj
+*_wpftmp.vbproj
+
+# Local toolset and reference source trees
+wix-7.0.0/
+wpfui-main/

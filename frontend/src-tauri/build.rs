@@ -2,6 +2,47 @@
 mod ffmpeg;
 
 fn main() {
+    // Bindgen needs an MSVC target, its C headers and libclang on Windows.
+    #[cfg(target_os = "windows")]
+    {
+        if std::env::var("BINDGEN_EXTRA_CLANG_ARGS").is_err() {
+            let mut args = String::from("--target=x86_64-pc-windows-msvc");
+            let vs_dirs = [
+                r"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC",
+                r"C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC",
+                r"C:\Program Files\Microsoft Visual Studio\2022\Professional\VC\Tools\MSVC",
+                r"C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Tools\MSVC",
+                r"C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\VC\Tools\MSVC",
+                r"C:\Program Files\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC",
+            ];
+            'outer: for vs in &vs_dirs {
+                if let Ok(entries) = std::fs::read_dir(vs) {
+                    for entry in entries.flatten() {
+                        let include = entry.path().join("include");
+                        if include.join("vcruntime.h").exists() {
+                            args.push_str(&format!(" -I\"{}\"", include.display()));
+                            break 'outer;
+                        }
+                    }
+                }
+            }
+            std::env::set_var("BINDGEN_EXTRA_CLANG_ARGS", args);
+        }
+
+        if std::env::var("LIBCLANG_PATH").is_err() {
+            for path in [
+                r"C:\Program Files\LLVM\bin",
+                r"C:\LLVM\bin",
+                r"C:\Program Files (x86)\LLVM\bin",
+            ] {
+                if std::path::Path::new(path).join("libclang.dll").exists() {
+                    std::env::set_var("LIBCLANG_PATH", path);
+                    break;
+                }
+            }
+        }
+    }
+
     // GPU Acceleration Detection and Build Guidance
     detect_and_report_gpu_capabilities();
 
